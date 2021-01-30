@@ -60,6 +60,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor {
                                             player.health = player.maxHealth
                                             player.inventory.clear()
                                         }
+                                        Bukkit.broadcastMessage("Mögen die Spiele beginnen!")
                                         t.cancel()
                                     }
                                 }, 1000, 1000)
