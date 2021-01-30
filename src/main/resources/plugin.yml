@@ -1,0 +1,9 @@
+name: FakeVaroPlugin
+version: 0.0.1
+description: Varo management plugin
+main: main.Loader
+
+commands:
+  varo:
+    description: varo options
+    usage: /<command> cmd
