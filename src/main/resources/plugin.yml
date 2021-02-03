@@ -6,4 +6,3 @@ main: main.Loader
 commands:
   varo:
     description: varo options
-    usage: /<command> cmd
