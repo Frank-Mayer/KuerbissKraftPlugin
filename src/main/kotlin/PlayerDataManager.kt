@@ -25,7 +25,7 @@ class PlayerDataManager : KoinComponent {
     private val storePath = "plugins/FakeVaroPlugin/"
     private val storeDir = "${storePath}Players.json"
     private var loaded = false
-    val today = (SimpleDateFormat("yyyyddMM").format(Calendar.getInstance().time)).toLong()
+    val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
 
     init {
         val path = File(storePath)
