@@ -77,7 +77,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerAchievementAwarded(event: PlayerAchievementAwardedEvent) {
-        Bukkit.broadcastMessage("${event.player.name} hat einen Erfolg freigeschalted")
+        Bukkit.broadcastMessage("Ein Spieler hat diesen Erfolg erzielt: ${event.achievement.name}")
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
