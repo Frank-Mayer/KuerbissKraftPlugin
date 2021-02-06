@@ -82,11 +82,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun onPlayerRespawn(event: PlayerRespawnEvent) {
-        event.player.kickPlayer("Durch deinen Tod bist du aus dem Spiel ausgeschlossen")
-    }
-
-    @EventHandler
     fun onPlayerAchievementAwarded(event: PlayerAchievementAwardedEvent) {
         Bukkit.broadcastMessage(
             "${ChatColor.YELLOW}Ein Spieler hat den Erfolg ${ChatColor.AQUA}${
