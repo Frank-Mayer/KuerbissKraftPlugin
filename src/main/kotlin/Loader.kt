@@ -1,6 +1,5 @@
 package main
 
-import org.bukkit.BanList
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -10,6 +9,10 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageEvent
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityCreatePortalEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
@@ -25,12 +28,15 @@ import kotlin.concurrent.timerTask
 class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var playerDataManager: PlayerDataManager
     private lateinit var cmdInterpreter: CmdInterpreter
+    private lateinit var entityDataManager: EntityDataManager
 
     override fun onEnable() {
         registerModules()
         playerDataManager = inject<PlayerDataManager>().value
+        entityDataManager = inject<EntityDataManager>().value
         cmdInterpreter = inject<CmdInterpreter>().value
         playerDataManager.loadData()
+        entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
         val tick = Timer()
         tick.schedule(timerTask {
@@ -82,6 +88,56 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         Bukkit.broadcastMessage("Ein Spieler hat diesen Erfolg erzielt: ${event.achievement.name}")
     }
 
+    @EventHandler
+    fun onBlockDamage(event: BlockDamageEvent) {
+        if (event.block.type == Material.CHEST) {
+            if (!entityDataManager.ownChest(
+                    event.block.location,
+                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                )
+            ) {
+                event.player.sendMessage("${ChatColor.RED}Das ist nicht deine Kiste!")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onBlockDamage(event: BlockBreakEvent) {
+        if (event.block.type == Material.CHEST) {
+            if (!entityDataManager.removeChest(
+                    event.block.location,
+                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                )
+            ) {
+                playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onBlockPlace(event: BlockPlaceEvent) {
+        if (event.block.type == Material.CHEST) {
+            entityDataManager.addChest(
+                event.block.location,
+                playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+            )
+        }
+    }
+
+    @EventHandler
+    fun onInventoryOpen(event: PlayerInteractEvent) {
+        if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock.type == Material.CHEST) {
+            if (!entityDataManager.ownChest(
+                    event.clickedBlock.location,
+                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                )
+            ) {
+                event.player.closeInventory()
+                playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste geöffnet")
+            }
+        }
+    }
+
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name == "varo") {
             return cmdInterpreter.command(sender, args)
@@ -91,6 +147,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     private fun onTick() {
         playerDataManager.storeData()
+        entityDataManager.storeData()
     }
 
     private fun registerModules() {
@@ -100,6 +157,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single<Plugin> { plugin }
             single { PlayerDataManager() }
             single { CmdInterpreter(get(), get()) }
+            single { EntityDataManager() }
         }
 
         startKoin {

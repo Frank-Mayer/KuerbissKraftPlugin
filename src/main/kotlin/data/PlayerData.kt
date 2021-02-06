@@ -1,9 +1,10 @@
 package main.data
 
 class PlayerData {
-    var Id: String = ""
-    var TeamName: String = ""
-    var Strikes: Long = 0
-    var LastLogout: Long = -1
-    var DayPlaytime: Long = 0
+    var id: String = ""
+    var teamName: String = ""
+    var strikes: Long = 0
+    var lastLogout: Long = -1
+    var dayPlayTime: Long = 0
+    var textures: String = "faithful"
 }

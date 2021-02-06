@@ -2,7 +2,6 @@ package main
 
 import org.bukkit.*
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
@@ -47,17 +46,26 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     }
                 }
 
-                "op" -> {
-                    Settings.onlyOp = args.count() < 2 || args[1] != "false"
-                    if (Settings.onlyOp) {
-                        for (player in Bukkit.getOnlinePlayers()) {
-                            if (player.isOp) {
-                                player.allowFlight = true
-                            } else {
-                                player.allowFlight = false
-                                player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
-                            }
+                "open" -> {
+                    Settings.open = true
+                    return true
+                }
+
+                "close" -> {
+                    Settings.open = false
+                    for (player in Bukkit.getOnlinePlayers()) {
+                        if (!player.isOp) {
+                            player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
                         }
+                    }
+                    return true
+                }
+
+                "reset" -> {
+                    if (args.count() >= 2) {
+                        playerDataManager.resetPlayerData(args[1])
+                    } else {
+                        playerDataManager.resetPlayerData(null)
                     }
                     return true
                 }
@@ -80,6 +88,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                             }
                         }
                     }
+                    return true
                 }
 
                 "start" -> {

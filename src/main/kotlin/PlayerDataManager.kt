@@ -4,13 +4,11 @@ import com.google.gson.Gson
 import main.data.PlayerData
 import org.bukkit.*
 import org.bukkit.entity.Player
-import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Team
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -23,15 +21,14 @@ class PlayerDataManager : KoinComponent {
     private val playersTracer = HashMap<String, PlayerTrace>()
     private val playersData = HashMap<String, PlayerData>()
     private val scoreboard = Bukkit.getScoreboardManager()?.mainScoreboard
-    private val storePath = "plugins/KuerbissKraft/"
-    private val storeDir = "${storePath}Players.json"
+    private val storeDir = "${Settings.storePath}Players.json"
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
 
     init {
-        val path = File(storePath)
+        val path = File(Settings.storePath)
         if (!path.exists()) {
-            File(storePath).mkdirs()
+            File(Settings.storePath).mkdirs()
         }
 
         val file = File(storeDir)
@@ -106,9 +103,9 @@ class PlayerDataManager : KoinComponent {
         if (playerId != null) {
             val data = playersData[playerId]
             if (data != null) {
-                data.Strikes = 0
-                data.LastLogout = -1
-                data.DayPlaytime = 0
+                data.strikes = 0
+                data.lastLogout = -1
+                data.dayPlayTime = 0
             }
         } else {
             for (p in Lib.getAllPlayers()) {
@@ -117,20 +114,28 @@ class PlayerDataManager : KoinComponent {
         }
     }
 
+    fun getPlayerTeam(playerId: String): String {
+        val data = playersData[playerId]
+        if (data != null) {
+            return data.teamName
+        }
+        return ""
+    }
+
     /**
      * Give a player a Strike
      */
     fun strikePlayer(player: Player, reason: String) {
         val data = playersData[Lib.getPlayerIdentifier(player)]
         if (data != null) {
-            data.Strikes++
-            player.sendMessage("Strike ${data.Strikes}: $reason")
-            if (data.Strikes >= 3) {
+            data.strikes++
+            player.sendMessage("Strike ${data.strikes}: $reason")
+            if (data.strikes >= 3) {
                 excludePlayer(player, "Zu viele Strikes")
                 return
             }
             else {
-                Bukkit.broadcastMessage("${ChatColor.RED}Strike ${data.Strikes} für ${player.name}: ${player.location.x} / ${player.location.y} / ${player.location.z}")
+                Bukkit.broadcastMessage("${ChatColor.RED}Strike ${data.strikes} für ${player.name}: ${Lib.locationToDesplay(player.location)}")
             }
         }
     }
@@ -150,24 +155,26 @@ class PlayerDataManager : KoinComponent {
         // Loop Json-Array
         for (playerDta in players) {
             val player = playerDta as JSONObject
-            val playerId = player["Id"] as String
+            val playerId = player["id"] as String
             // Player data existent?
             if (playersData.containsKey(playerId)) {
                 val p = playersData[playerId]
                 if (p != null) {
-                    p.Id = playerId
-                    p.TeamName = player["TeamName"] as String
-                    p.Strikes = player["Strikes"] as Long
-                    p.LastLogout = player["LastLogout"] as Long
-                    p.DayPlaytime = player["DayPlaytime"] as Long
+                    p.id = playerId
+                    p.teamName = player["teamName"] as String
+                    p.strikes = player["strikes"] as Long
+                    p.lastLogout = player["lastLogout"] as Long
+                    p.dayPlayTime = player["dayPlayTime"] as Long
+                    p.textures = player["textures"] as String
                 }
             } else {
                 val p = PlayerData()
-                p.Id = playerId
-                p.TeamName = player["TeamName"] as String
-                p.Strikes = player["Strikes"] as Long
-                p.LastLogout = player["LastLogout"] as Long
-                p.DayPlaytime = player["DayPlaytime"] as Long
+                p.id = playerId
+                p.teamName = player["teamName"] as String
+                p.strikes = player["strikes"] as Long
+                p.lastLogout = player["lastLogout"] as Long
+                p.dayPlayTime = player["dayPlayTime"] as Long
+                p.textures = player["textures"] as String
                 playersData[playerId] = p
             }
         }
@@ -182,7 +189,6 @@ class PlayerDataManager : KoinComponent {
         if (!loaded) {
             loadData()
         }
-        Logger.log("${ChatColor.GREEN}Storing data")
         val gson = Gson()
         val jsonSB = StringBuilder()
         jsonSB.append("[")
@@ -196,11 +202,10 @@ class PlayerDataManager : KoinComponent {
         }
         jsonSB.append("]")
         val json = jsonSB.toString()
-        Logger.log(json)
         val fw = FileWriter(storeDir)
         fw.write(json)
         fw.close()
-        Logger.log("Match data saved")
+        Logger.log("Player data saved")
     }
 
     fun addPlayerToTeam(player: String, team: String) {

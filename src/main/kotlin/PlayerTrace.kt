@@ -18,11 +18,11 @@ class PlayerTrace(
 
     init {
         Logger.log("Tracing player ${controlledPlayer.name}")
-        playerDataManager.addPlayerToTeam(controlledPlayer.name, playerData.TeamName)
-        if (playerData.DayPlaytime >= Settings.maxPlayTime) {
+        playerDataManager.addPlayerToTeam(controlledPlayer.name, playerData.teamName)
+        if (playerData.dayPlayTime >= Settings.maxPlayTime) {
             timeEnd()
         }
-        playerData.LastLogout = playerDataManager.today;
+        playerData.lastLogout = playerDataManager.today;
         startTimer()
     }
 
@@ -30,12 +30,12 @@ class PlayerTrace(
         val t = Timer()
         t.schedule(timerTask {
             if (controlledPlayer.isOnline) {
-                playerData.DayPlaytime++
-                playerData.Id = Lib.getPlayerIdentifier(controlledPlayer)
-                playerData.LastLogout = playerDataManager.today
+                playerData.dayPlayTime++
+                playerData.id = Lib.getPlayerIdentifier(controlledPlayer)
+                playerData.lastLogout = playerDataManager.today
                 playerDataManager.updatePlayerData(Lib.getPlayerIdentifier(controlledPlayer), playerData)
-                val timeLeft = (Settings.maxPlayTime - playerData.DayPlaytime).toInt()
-                if (playerData.DayPlaytime >= Settings.maxPlayTime) {
+                val timeLeft = (Settings.maxPlayTime - playerData.dayPlayTime).toInt()
+                if (playerData.dayPlayTime >= Settings.maxPlayTime) {
                     timeEnd()
                     t.cancel()
                 } else if (timeLeft == 60 || timeLeft == 30 || timeLeft == 15 || timeLeft <= 10) {
