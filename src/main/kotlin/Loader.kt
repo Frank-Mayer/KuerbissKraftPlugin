@@ -1,6 +1,9 @@
 package main
 
+import org.bukkit.BanList
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -9,17 +12,13 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityCreatePortalEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerResourcePackStatusEvent
-import org.bukkit.event.player.PlayerRespawnEvent
-import org.bukkit.event.player.PlayerAchievementAwardedEvent
+import org.bukkit.event.player.*
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import org.koin.core.component.inject
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -49,6 +48,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun quitEvent(event: PlayerQuitEvent) {
         playerDataManager.removePlayer(event.player)
+        if (Settings.quitNotAllowed) {
+            playerDataManager.strikePlayer(event.player, "Du hast den Server während der Startphase verlassen")
+        }
     }
 
     @EventHandler
@@ -67,7 +69,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onEntityCreatePortal(event: EntityCreatePortalEvent) {
-        Bukkit.broadcastMessage("${event.entity.name} hat ein Portal erstellt")
+        Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}${event.entity.name} hat ein Portal erstellt")
     }
 
     @EventHandler
@@ -82,7 +84,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name == "varo") {
-            return cmdInterpreter.command(sender, label, args)
+            return cmdInterpreter.command(sender, args)
         }
         return false
     }

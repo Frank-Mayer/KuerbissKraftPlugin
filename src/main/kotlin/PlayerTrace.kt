@@ -10,24 +10,19 @@ import kotlin.concurrent.timerTask
 
 class PlayerTrace(
     player: org.bukkit.entity.Player,
-    data: PlayerData
+    private val playerData: PlayerData
 ) {
     private val controlledPlayer: org.bukkit.entity.Player = player
-    private var todayPlaytime: Long = 0L
-    private var strikes: Long = 0
-    private val playerData = data
-    private var teamName = playerData.TeamName
     private val playerDataManager: PlayerDataManager = get().get()
     private val plugin: Plugin = get().get()
 
     init {
-        if (playerDataManager.today == playerData.LastLogout) {
-            todayPlaytime = playerData.DayPlaytime
-        }
-        if (todayPlaytime >= Settings.maxPlayTime) {
+        Logger.log("Tracing player ${controlledPlayer.name}")
+        playerDataManager.addPlayerToTeam(controlledPlayer.name, playerData.TeamName)
+        if (playerData.DayPlaytime >= Settings.maxPlayTime) {
             timeEnd()
         }
-        playerDataManager.addPlayerToTeam(controlledPlayer.name, teamName)
+        playerData.LastLogout = playerDataManager.today;
         startTimer()
     }
 
@@ -35,14 +30,12 @@ class PlayerTrace(
         val t = Timer()
         t.schedule(timerTask {
             if (controlledPlayer.isOnline) {
-                todayPlaytime++
+                playerData.DayPlaytime++
                 playerData.Id = Lib.getPlayerIdentifier(controlledPlayer)
-                playerData.Strikes = strikes
-                playerData.DayPlaytime = todayPlaytime
                 playerData.LastLogout = playerDataManager.today
                 playerDataManager.updatePlayerData(Lib.getPlayerIdentifier(controlledPlayer), playerData)
-                val timeLeft = (Settings.maxPlayTime - todayPlaytime).toInt()
-                if (todayPlaytime >= Settings.maxPlayTime) {
+                val timeLeft = (Settings.maxPlayTime - playerData.DayPlaytime).toInt()
+                if (playerData.DayPlaytime >= Settings.maxPlayTime) {
                     timeEnd()
                     t.cancel()
                 } else if (timeLeft == 60 || timeLeft == 30 || timeLeft == 15 || timeLeft <= 10) {

@@ -6,7 +6,7 @@ import java.util.logging.Level
 
 object Logger {
     fun log(txt: String) {
-        Bukkit.getLogger().log(Level.ALL, txt)
+        Bukkit.getLogger().log(Level.INFO, txt)
         if (Settings.oPsGetLog) {
             for (player in Bukkit.getOnlinePlayers()) {
                 if (player.isOp) {

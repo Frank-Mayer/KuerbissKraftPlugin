@@ -1,6 +1,7 @@
 package main
 
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
 object Lib {
@@ -8,12 +9,15 @@ object Lib {
         return player.name
     }
 
+    fun getPlayerIdentifier(player: OfflinePlayer): String {
+        return player.name
+    }
+
     fun playerCheckIn(player: Player, dataManager: PlayerDataManager): Boolean {
         if (Settings.onlyOp) {
             if (player.isOp) {
                 player.allowFlight = true
-            }
-            else {
+            } else {
                 player.allowFlight = false
                 player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
                 return false
@@ -24,16 +28,16 @@ object Lib {
             player.kickPlayer("Deine Tageszeit ist aufgebraucht")
             return false
         }
-//        player.setResourcePack("https://frank-mayer.tk/cdn/vanillaxbr-classic.zip")
+        player.setResourcePack("https://frank-mayer.tk/cdn/vanillaxbr-classic.zip")
         return true
     }
 
-    fun getAllPlayers(): List<Player> {
-        return Bukkit.getOnlinePlayers().plus(Bukkit.getOfflinePlayers()) as List<Player>
+    fun getAllPlayers(): List<OfflinePlayer> {
+        return Bukkit.getOnlinePlayers().plus(Bukkit.getOfflinePlayers())
     }
 
     fun getPlayerByName(name: String): Player? {
-        for (player in getAllPlayers()) {
+        for (player in Bukkit.getOnlinePlayers()) {
             if (player.name == name) {
                 return player
             }

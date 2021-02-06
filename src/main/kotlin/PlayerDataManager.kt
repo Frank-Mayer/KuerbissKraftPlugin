@@ -5,6 +5,7 @@ import main.data.PlayerData
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.DisplaySlot
+import org.bukkit.scoreboard.Team
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -22,7 +23,7 @@ class PlayerDataManager : KoinComponent {
     private val playersTracer = HashMap<String, PlayerTrace>()
     private val playersData = HashMap<String, PlayerData>()
     private val scoreboard = Bukkit.getScoreboardManager()?.mainScoreboard
-    private val storePath = "plugins/FakeVaroPlugin/"
+    private val storePath = "plugins/KuerbissKraft/"
     private val storeDir = "${storePath}Players.json"
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
@@ -57,20 +58,22 @@ class PlayerDataManager : KoinComponent {
      * Add player tracing
      */
     fun addPlayer(player: Player) {
+        Logger.log("Adding Player")
         try {
             if (!loaded) {
                 loadData()
             }
-        }
-        finally {
             val id = Lib.getPlayerIdentifier(player)
             Logger.log("initializing player trace $id")
             if (playersData.containsKey(id)) {
                 playersTracer[id] = PlayerTrace(player, playersData[id]!!)
             }
             else {
-                Logger.error("Not player data found for $id")
+                Logger.error("No player data found for $id")
             }
+        }
+        catch(e: Exception) {
+            Logger.error(e.localizedMessage)
         }
     }
 
@@ -88,19 +91,20 @@ class PlayerDataManager : KoinComponent {
      */
     fun excludePlayer(player: Player, reason: String) {
         Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
-        player.gameMode = GameMode.SPECTATOR
-//            player.kickPlayer(reason)
-        for (p in Bukkit.getOnlinePlayers()) {
-            p.playSound(p.location, Sound.ENTITY_LIGHTNING_THUNDER, 1.0F, 0.9F)
+        if (player.isOnline) {
+            player.kickPlayer(reason)
+            for (p in Bukkit.getOnlinePlayers()) {
+                p.playSound(p.location, Sound.ENTITY_LIGHTNING_THUNDER, 1.0F, 0.9F)
+            }
         }
     }
 
     /**
      * Reset data of a player or all players
      */
-    fun resetPlayerData(player: Player?) {
-        if (player != null) {
-            val data = playersData[Lib.getPlayerIdentifier(player)]
+    fun resetPlayerData(playerId: String?) {
+        if (playerId != null) {
+            val data = playersData[playerId]
             if (data != null) {
                 data.Strikes = 0
                 data.LastLogout = -1
@@ -108,7 +112,7 @@ class PlayerDataManager : KoinComponent {
             }
         } else {
             for (p in Lib.getAllPlayers()) {
-                resetPlayerData(p)
+                resetPlayerData(Lib.getPlayerIdentifier(p))
             }
         }
     }
@@ -121,12 +125,12 @@ class PlayerDataManager : KoinComponent {
         if (data != null) {
             data.Strikes++
             player.sendMessage("Strike ${data.Strikes}: $reason")
-            if (data.Strikes > 3) {
+            if (data.Strikes >= 3) {
                 excludePlayer(player, "Zu viele Strikes")
                 return
             }
             else {
-                Bukkit.broadcastMessage("${ChatColor.RED}Strike ${data.Strikes} für ${player.name}: ${player.location}")
+                Bukkit.broadcastMessage("${ChatColor.RED}Strike ${data.Strikes} für ${player.name}: ${player.location.x} / ${player.location.y} / ${player.location.z}")
             }
         }
     }
@@ -210,6 +214,8 @@ class PlayerDataManager : KoinComponent {
             } else if (!t.hasEntry(player)) {
                 t.addEntry(player)
             }
+            t.setAllowFriendlyFire(false)
+            t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OTHER_TEAMS)
             Logger.log("added $player to $team")
         } else {
             Logger.error("scoreboard is null")
