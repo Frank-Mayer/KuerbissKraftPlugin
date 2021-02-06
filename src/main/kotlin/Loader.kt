@@ -18,6 +18,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -25,6 +26,7 @@ import org.koin.dsl.module
 import java.util.*
 import kotlin.concurrent.timerTask
 
+@KoinApiExtension
 class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var playerDataManager: PlayerDataManager
     private lateinit var cmdInterpreter: CmdInterpreter
@@ -48,6 +50,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
+            event.player.sendMessage("${ChatColor.YELLOW}Nutze die /varo <option> commands um aktuelle Informationen zu erhalten")
         }
     }
 
@@ -85,7 +88,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerAchievementAwarded(event: PlayerAchievementAwardedEvent) {
-        Bukkit.broadcastMessage("Ein Spieler hat diesen Erfolg erzielt: ${event.achievement.name}")
+        Bukkit.broadcastMessage(
+            "${ChatColor.YELLOW}Ein Spieler hat den Erfolg ${ChatColor.AQUA}${
+                event.achievement.name.replace(
+                    '_',
+                    ' '
+                )
+            }${ChatColor.YELLOW} erziehlt"
+        )
     }
 
     @EventHandler
@@ -157,7 +167,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single<Plugin> { plugin }
             single { PlayerDataManager() }
             single { CmdInterpreter(get(), get()) }
-            single { EntityDataManager() }
+            single { EntityDataManager(get()) }
         }
 
         startKoin {

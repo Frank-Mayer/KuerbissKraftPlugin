@@ -2,13 +2,14 @@ package main
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.lang.reflect.Type
 
-class EntityDataManager {
+class EntityDataManager(private val playerDataManager: PlayerDataManager) {
     private val storeDir = "${Settings.storePath}Entities.json"
     private var loaded = false
     private val chests = hashMapOf<String, String>()
@@ -64,7 +65,16 @@ class EntityDataManager {
         val key = Lib.locationToDesplay(location)
         val value = chests[key]
         if (value != null) {
-            return value == team
+            if (value == team) {
+                return true
+            }
+            else {
+                for (player in Bukkit.getOnlinePlayers()) {
+                    if (playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(player)) == team) {
+                        return false
+                    }
+                }
+            }
         }
         return true
     }

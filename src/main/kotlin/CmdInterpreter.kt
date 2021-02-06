@@ -18,15 +18,15 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     "strikes" -> {
                         val data = playerDataManager.getPlayerData(Lib.getPlayerIdentifier(sender))
                         if (data != null) {
-                            sender.sendMessage("Du hast ${data.strikes} Strikes")
+                            sender.sendMessage("${ChatColor.YELLOW}Du hast ${data.strikes} Strikes")
                         } else {
-                            sender.sendMessage("Fehler, keine Daten gefunden")
+                            sender.sendMessage("${ChatColor.RED}Fehler, keine Daten gefunden")
                         }
                         return true
                     }
                 }
                 if (!sender.isOp) {
-                    sender.sendMessage("?\nstrikes: Sehe nach wie viele Strikes du hast")
+                    sender.sendMessage("${ChatColor.YELLOW}?\nstrikes: Sehe nach wie viele Strikes du hast")
                     return false
                 }
             }

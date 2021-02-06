@@ -129,13 +129,13 @@ class PlayerDataManager : KoinComponent {
         val data = playersData[Lib.getPlayerIdentifier(player)]
         if (data != null) {
             data.strikes++
-            player.sendMessage("Strike ${data.strikes}: $reason")
+            player.sendMessage("${ChatColor.RED}Strike ${data.strikes}: $reason")
             if (data.strikes >= 3) {
                 excludePlayer(player, "Zu viele Strikes")
                 return
             }
             else {
-                Bukkit.broadcastMessage("${ChatColor.RED}Strike ${data.strikes} für ${player.name}: ${Lib.locationToDesplay(player.location)}")
+                Bukkit.broadcastMessage("${ChatColor.YELLOW}Strike ${data.strikes} für ${player.name}: ${Lib.locationToDesplay(player.location)}")
             }
         }
     }
