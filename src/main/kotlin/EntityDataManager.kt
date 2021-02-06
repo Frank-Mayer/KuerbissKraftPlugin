@@ -1,13 +1,12 @@
 package main
 
 import com.google.gson.Gson
-import java.lang.reflect.Type
 import com.google.gson.reflect.TypeToken
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import java.lang.reflect.Type
 
 class EntityDataManager {
     private val storeDir = "${Settings.storePath}Entities.json"
@@ -31,7 +30,7 @@ class EntityDataManager {
         val fr = FileReader(storeDir)
         val json = fr.readText()
         fr.close()
-        val type: Type = object : TypeToken<Map<String, String>>(){}.type
+        val type: Type = object : TypeToken<Map<String, String>>() {}.type
         val impMap: Map<String, String> = gson.fromJson(json, type)
         for (el in impMap) {
             chests[el.key] = el.value
