@@ -47,8 +47,8 @@ class PlayerDataManager : KoinComponent {
     /**
      * Find data with player id
      */
-    fun getPlayerData(id: String): PlayerData? {
-        return playersData[id]
+    fun getPlayerData(playerId: String): PlayerData? {
+        return playersData[playerId]
     }
 
     /**
