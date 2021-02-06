@@ -45,7 +45,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun joinEvent(event: PlayerJoinEvent) {
+    fun onPlayerJoin(event: PlayerJoinEvent) {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
         }
