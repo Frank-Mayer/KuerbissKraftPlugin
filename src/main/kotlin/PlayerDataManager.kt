@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import main.data.PlayerData
 import org.bukkit.*
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.Team
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -231,5 +233,11 @@ class PlayerDataManager : KoinComponent {
         } else {
             Logger.error("scoreboard is null")
         }
+    }
+
+    fun loginProtection(player: Player) {
+        player.addPotionEffect(PotionEffect(PotionEffectType.FIRE_RESISTANCE, 200, 3))
+        player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 5))
+        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 5))
     }
 }

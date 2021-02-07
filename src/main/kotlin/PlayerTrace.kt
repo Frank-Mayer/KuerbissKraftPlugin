@@ -33,6 +33,7 @@ class PlayerTrace(
     }
 
     private fun startTimer() {
+        playerDataManager.loginProtection(controlledPlayer)
         val t = Timer()
         t.schedule(timerTask {
             if (controlledPlayer.isOnline) {
