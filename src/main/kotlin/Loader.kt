@@ -16,9 +16,9 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityCreatePortalEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -30,12 +30,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var playerDataManager: PlayerDataManager
     private lateinit var cmdInterpreter: CmdInterpreter
     private lateinit var entityDataManager: EntityDataManager
+    private lateinit var badLanguageChecker: BadLanguageChecker
 
     override fun onEnable() {
         registerModules()
         playerDataManager = inject<PlayerDataManager>().value
         entityDataManager = inject<EntityDataManager>().value
         cmdInterpreter = inject<CmdInterpreter>().value
+        badLanguageChecker = inject<BadLanguageChecker>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -142,6 +144,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         }
     }
 
+    @EventHandler
+    fun onPlayerChat(event: AsyncPlayerChatEvent) {
+        if (badLanguageChecker.filter(event.message)) {
+            event.message = ""
+            playerDataManager.strikePlayer(event.player, "Deine Chat Nachricht ist möglicherweise beleidigend")
+        }
+    }
+
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name == "kürbiss" || command.name == "kurbiss" || command.name == "kuerbiss" || command.name == "kürbis" || command.name == "kurbis" || command.name == "kuerbis") {
             return cmdInterpreter.command(sender, args)
@@ -162,6 +172,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { PlayerDataManager() }
             single { CmdInterpreter(get(), get()) }
             single { EntityDataManager(get()) }
+            single { BadLanguageChecker() }
         }
 
         startKoin {
