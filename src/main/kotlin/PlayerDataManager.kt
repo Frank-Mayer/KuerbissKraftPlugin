@@ -91,6 +91,7 @@ class PlayerDataManager : KoinComponent {
     fun excludePlayer(player: Player, reason: String) {
 //        Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
         getPlayerData(Lib.getPlayerIdentifier(player))?.alive = false
+        Bukkit.broadcastMessage("${ChatColor.YELLOW}${player.name}${ChatColor.AQUA} ist aus dem Spiel ausgeschieden")
         if (player.isOnline) {
             player.kickPlayer(reason)
             for (p in Bukkit.getOnlinePlayers()) {
