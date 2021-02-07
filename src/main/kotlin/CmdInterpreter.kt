@@ -18,7 +18,17 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     "strikes" -> {
                         val data = playerDataManager.getPlayerData(Lib.getPlayerIdentifier(sender))
                         if (data != null) {
-                            sender.sendMessage("${ChatColor.YELLOW}Du hast ${data.strikes} Strikes")
+                            sender.sendMessage("${ChatColor.AQUA}Du hast ${ChatColor.YELLOW}${data.strikes}${ChatColor.AQUA} Strikes")
+                        } else {
+                            sender.sendMessage("${ChatColor.RED}Fehler, keine Daten gefunden")
+                        }
+                        return true
+                    }
+
+                    "time" -> {
+                        val data = playerDataManager.getPlayerData(Lib.getPlayerIdentifier(sender))
+                        if (data != null) {
+                            sender.sendMessage("${ChatColor.AQUA}Deine heutige Online-Zeit: ${ChatColor.YELLOW}${data.dayPlayTime/60}:${data.dayPlayTime%60}")
                         } else {
                             sender.sendMessage("${ChatColor.RED}Fehler, keine Daten gefunden")
                         }
@@ -26,7 +36,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     }
                 }
                 if (!sender.isOp) {
-                    sender.sendMessage("${ChatColor.YELLOW}?\nstrikes: Sehe nach wie viele Strikes du hast")
+                    sender.sendMessage("${ChatColor.AQUA}?\nstrikes: Sehe nach wie viele Strikes du hast")
                     return false
                 }
             }

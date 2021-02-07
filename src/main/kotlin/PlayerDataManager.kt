@@ -137,7 +137,9 @@ class PlayerDataManager : KoinComponent {
                 return
             }
             else {
-                Bukkit.broadcastMessage("${ChatColor.YELLOW}Strike ${data.strikes} für ${player.name}: ${Lib.locationToDesplay(player.location)}")
+                Bukkit.broadcastMessage(
+                    "${ChatColor.AQUA}Strike ${data.strikes} für ${ChatColor.YELLOW}${player.name}${ChatColor.AQUA}: ${ChatColor.YELLOW}${Lib.locationToDesplay(player.location)}"
+                )
             }
         }
     }
@@ -218,7 +220,7 @@ class PlayerDataManager : KoinComponent {
             var t = scoreboard.getTeam(team)
             if (t == null) {
                 t = scoreboard.registerNewTeam(team)
-                t.prefix = "${ChatColor.AQUA}[$team] "
+                t.prefix = "[$team] "
                 t.addEntry(player)
             } else if (!t.hasEntry(player)) {
                 t.addEntry(player)

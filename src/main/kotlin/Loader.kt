@@ -26,7 +26,6 @@ import org.koin.dsl.module
 import java.util.*
 import kotlin.concurrent.timerTask
 
-@KoinApiExtension
 class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var playerDataManager: PlayerDataManager
     private lateinit var cmdInterpreter: CmdInterpreter
@@ -50,7 +49,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
-            event.player.sendMessage("${ChatColor.YELLOW}Nutze die /varo <option> commands um aktuelle Informationen zu erhalten")
+            event.player.sendMessage("${ChatColor.AQUA}Nutze die /kurbiss <option> commands um aktuelle Informationen zu erhalten\nstrikes: Zeigt wie viele Strikes du hast\ntime: zeigt deine aktuelle Online-Zeit an")
         }
     }
 
@@ -84,12 +83,12 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onPlayerAchievementAwarded(event: PlayerAchievementAwardedEvent) {
         Bukkit.broadcastMessage(
-            "${ChatColor.YELLOW}Ein Spieler hat den Erfolg ${ChatColor.AQUA}${
+            "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${
                 event.achievement.name.replace(
                     '_',
                     ' '
                 )
-            }${ChatColor.YELLOW} erziehlt"
+            }${ChatColor.AQUA} erziehlt"
         )
     }
 
