@@ -107,6 +107,7 @@ class PlayerDataManager : KoinComponent {
                 data.strikes = 0
                 data.lastLogout = -1
                 data.dayPlayTime = 0
+                data.alive = true
             }
         } else {
             for (p in Lib.getAllPlayers()) {
