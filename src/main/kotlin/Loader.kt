@@ -144,7 +144,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        if (command.name == "varo") {
+        if (command.name == "kürbiss" || command.name == "kurbiss" || command.name == "kuerbiss" || command.name == "kürbis" || command.name == "kurbis" || command.name == "kuerbis") {
             return cmdInterpreter.command(sender, args)
         }
         return false

@@ -1,8 +1,18 @@
-name: FakeVaroPlugin
-version: 0.0.1
-description: Varo management plugin
+name: KuerbissKraft
+version: 0.1.0
+description: Game management plugin
 main: main.Loader
 
 commands:
-  varo:
+  kurbiss:
+    description: varo options
+  kürbiss:
+    description: varo options
+  kuerbiss:
+    description: varo options
+  kurbis:
+    description: varo options
+  kürbis:
+    description: varo options
+  kuerbis:
     description: varo options
