@@ -133,7 +133,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                             world.setGameRuleValue("logAdminCommands", "false")
                             world.setGameRuleValue("showDeathMessages", "true")
                             world.setGameRuleValue("announceAdvancements", "false")
-                            world.difficulty = Difficulty.HARD
+                            world.difficulty = Difficulty.EASY
                             world.fullTime = 0
                         }
 
