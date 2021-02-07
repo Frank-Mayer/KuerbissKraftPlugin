@@ -19,11 +19,14 @@ class PlayerTrace(
     init {
         Logger.log("Tracing player ${controlledPlayer.name}")
         playerDataManager.addPlayerToTeam(controlledPlayer.name, playerData.teamName)
-        if (playerData.dayPlayTime >= Settings.maxPlayTime) {
+        if (playerData.lastLogout == playerDataManager.today && playerData.dayPlayTime >= Settings.maxPlayTime) {
             timeEnd()
         }
-        playerData.lastLogout = playerDataManager.today;
-        startTimer()
+        else {
+            playerData.dayPlayTime = 0
+            playerData.lastLogout = playerDataManager.today;
+            startTimer()
+        }
     }
 
     private fun startTimer() {

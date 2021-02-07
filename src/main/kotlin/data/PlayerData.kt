@@ -7,4 +7,5 @@ class PlayerData {
     var lastLogout: Long = -1
     var dayPlayTime: Long = 0
     var textures: String = "faithful"
+    var alive: Boolean = true
 }

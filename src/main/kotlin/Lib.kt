@@ -25,6 +25,9 @@ object Lib {
                 player.kickPlayer("Deine Tageszeit ist aufgebraucht")
                 return false
             }
+            else if (!data.alive) {
+                player.kickPlayer("Durch deinen Tod bist du aus dem Spiel ausgeschlossen")
+            }
             player.setResourcePack("https://kuerbisskraft.web.app/textures/${data.textures}.zip")
             return true
         }

@@ -87,11 +87,12 @@ class PlayerDataManager : KoinComponent {
      * Exclude a player from the game
      */
     fun excludePlayer(player: Player, reason: String) {
-        Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
+//        Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
+        getPlayerData(Lib.getPlayerIdentifier(player))?.alive = false
         if (player.isOnline) {
             player.kickPlayer(reason)
             for (p in Bukkit.getOnlinePlayers()) {
-                p.playSound(p.location, Sound.ENTITY_LIGHTNING_THUNDER, 1.0F, 0.9F)
+                p.playSound(p.location, Sound.ENTITY_LIGHTNING_THUNDER, 1.0F, 0.8F)
             }
         }
     }
@@ -166,6 +167,7 @@ class PlayerDataManager : KoinComponent {
                     p.lastLogout = player["lastLogout"] as Long
                     p.dayPlayTime = player["dayPlayTime"] as Long
                     p.textures = player["textures"] as String
+                    p.alive = player["alive"] as Boolean
                 }
             } else {
                 val p = PlayerData()
@@ -175,6 +177,7 @@ class PlayerDataManager : KoinComponent {
                 p.lastLogout = player["lastLogout"] as Long
                 p.dayPlayTime = player["dayPlayTime"] as Long
                 p.textures = player["textures"] as String
+                p.alive = player["alive"] as Boolean
                 playersData[playerId] = p
             }
         }
