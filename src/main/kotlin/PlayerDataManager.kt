@@ -26,6 +26,7 @@ class PlayerDataManager : KoinComponent {
     private val storeDir = "${Settings.storePath}Players.json"
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
+    private var lastHash:Int = -1
 
     init {
         val path = File(Settings.storePath)
@@ -189,6 +190,7 @@ class PlayerDataManager : KoinComponent {
         }
         Logger.log("Data imported")
         loaded = true
+        lastHash = json.hashCode()
     }
 
     /**
@@ -211,10 +213,17 @@ class PlayerDataManager : KoinComponent {
         }
         jsonSB.append("]")
         val json = jsonSB.toString()
-        val fw = FileWriter(storeDir)
-        fw.write(json)
-        fw.close()
-        Logger.log("Player data saved")
+        val hash = json.hashCode()
+        if (hash != lastHash) {
+            val fw = FileWriter(storeDir)
+            fw.write(json)
+            fw.close()
+            lastHash = hash
+            Logger.log("Player data saved")
+        }
+        else {
+            Logger.log("No changes in Player data")
+        }
     }
 
     fun addPlayerToTeam(player: String, team: String) {

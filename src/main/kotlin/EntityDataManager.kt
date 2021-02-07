@@ -13,6 +13,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
     private val storeDir = "${Settings.storePath}Entities.json"
     private var loaded = false
     private val chests = hashMapOf<String, String>()
+    private var lastHash:Int = -1
 
     init {
         val path = File(Settings.storePath)
@@ -37,6 +38,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
             chests[el.key] = el.value
         }
         loaded = true
+        lastHash = json.hashCode()
     }
 
     fun storeData() {
@@ -45,10 +47,17 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
         }
         val gson = Gson()
         val json = gson.toJson(chests)
-        val fw = FileWriter(storeDir)
-        fw.write(json)
-        fw.close()
-        Logger.log("Entity data saved")
+        val hash = json.hashCode()
+        if (hash != lastHash) {
+            val fw = FileWriter(storeDir)
+            fw.write(json)
+            fw.close()
+            lastHash = hash
+            Logger.log("Entity data saved")
+        }
+        else {
+            Logger.log("No changes in Entity data")
+        }
     }
 
     fun addChest(location: Location, team: String) {
