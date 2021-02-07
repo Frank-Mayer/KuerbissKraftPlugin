@@ -1,6 +1,7 @@
 package main
 
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
@@ -22,16 +23,24 @@ object Lib {
         val data = dataManager.getPlayerData(getPlayerIdentifier(player))
         if (data != null) {
             if (data.lastLogout == dataManager.today && data.dayPlayTime >= Settings.maxPlayTime - 2) {
-                player.kickPlayer("Deine Tageszeit ist aufgebraucht")
+                if (player.isOp) {
+                    player.gameMode = GameMode.SPECTATOR
+                } else {
+                    player.kickPlayer("Deine Tageszeit ist aufgebraucht")
+                }
+                return false
+            } else if (!data.alive) {
+                if (player.isOp) {
+                    player.gameMode = GameMode.SPECTATOR
+                } else {
+                    player.kickPlayer("Durch deinen Tod bist du aus dem Spiel ausgeschlossen")
+                }
                 return false
             }
-            else if (!data.alive) {
-                player.kickPlayer("Durch deinen Tod bist du aus dem Spiel ausgeschlossen")
-            }
-            player.setResourcePack("https://kuerbisskraft.web.app/textures/${data.textures}.zip")
+//            player.setResourcePack("https://kuerbisskraft.web.app/textures/${data.textures}.zip")
             return true
         }
-        player.kickPlayer("Keine Spielerdaten verfügbar")
+        player.kickPlayer("Keine Spielerdaten verfügbar, bitte wende Dich an den Veranstalter")
         return false
     }
 
