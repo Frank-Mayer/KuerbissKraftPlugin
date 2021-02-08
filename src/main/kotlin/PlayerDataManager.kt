@@ -2,7 +2,9 @@ package main
 
 import com.google.gson.Gson
 import main.data.PlayerData
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -26,7 +28,7 @@ class PlayerDataManager : KoinComponent {
     private val storeDir = "${Settings.storePath}Players.json"
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
-    private var lastHash:Int = -1
+    private var lastHash: Int = -1
 
     init {
         val path = File(Settings.storePath)
@@ -67,12 +69,10 @@ class PlayerDataManager : KoinComponent {
             Logger.log("initializing player trace $id")
             if (playersData.containsKey(id)) {
                 playersTracer[id] = PlayerTrace(player, playersData[id]!!)
-            }
-            else {
+            } else {
                 Logger.error("No player data found for $id")
             }
-        }
-        catch(e: Exception) {
+        } catch (e: Exception) {
             Logger.error(e.localizedMessage)
         }
     }
@@ -131,19 +131,23 @@ class PlayerDataManager : KoinComponent {
     /**
      * Give a player a Strike
      */
-    fun strikePlayer(player: Player, reason: String) {
+    fun strikePlayer(player: Player, reason: String, amount: Int = 1) {
         val data = playersData[Lib.getPlayerIdentifier(player)]
         if (data != null) {
-            data.strikes++
+            data.strikes += amount
             player.sendMessage("${ChatColor.RED}Strike ${data.strikes}: $reason")
             if (data.strikes >= 3) {
                 excludePlayer(player, "Zu viele Strikes")
                 return
-            }
-            else {
+            } else {
                 Bukkit.broadcastMessage(
-                    "${ChatColor.AQUA}Strike ${data.strikes} für ${ChatColor.YELLOW}${player.name}${ChatColor.AQUA}: ${ChatColor.YELLOW}${Lib.locationToDesplay(player.location)}"
+                    "${ChatColor.AQUA}Strike ${data.strikes} für ${ChatColor.YELLOW}${player.name}${ChatColor.AQUA}: ${ChatColor.YELLOW}${
+                        Lib.locationToDesplay(
+                            player.location
+                        )
+                    }"
                 )
+                player.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200, 1))
             }
         }
     }
@@ -220,8 +224,7 @@ class PlayerDataManager : KoinComponent {
             fw.close()
             lastHash = hash
             Logger.log("Player data saved")
-        }
-        else {
+        } else {
             Logger.log("No changes in Player data")
         }
     }
