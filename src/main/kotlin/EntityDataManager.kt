@@ -65,9 +65,11 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
     }
 
     fun removeChest(location: Location, team: String): Boolean {
-        val owned = ownChest(location, team)
-        chests.remove(Lib.locationToDesplay(location))
-        return owned
+        if (ownChest(location, team)) {
+            chests.remove(Lib.locationToDesplay(location))
+            return true
+        }
+        return false
     }
 
     fun ownChest(location: Location, team: String): Boolean {

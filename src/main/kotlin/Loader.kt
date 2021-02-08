@@ -96,7 +96,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockDamage(event: BlockDamageEvent) {
-        if (event.block.type == Material.CHEST) {
+        if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
             if (!entityDataManager.ownChest(
                     event.block.location,
                     playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
@@ -108,21 +108,22 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun onBlockDamage(event: BlockBreakEvent) {
-        if (event.block.type == Material.CHEST) {
+    fun onBlockBreak(event: BlockBreakEvent) {
+        if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
             if (!entityDataManager.removeChest(
                     event.block.location,
                     playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
                 )
             ) {
                 playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
+                event.isCancelled = true
             }
         }
     }
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-        if (event.block.type == Material.CHEST) {
+        if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
             entityDataManager.addChest(
                 event.block.location,
                 playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
@@ -132,7 +133,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onInventoryOpen(event: PlayerInteractEvent) {
-        if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock.type == Material.CHEST) {
+        if (event.action == Action.RIGHT_CLICK_BLOCK && (event.clickedBlock.type == Material.CHEST || event.clickedBlock.type == Material.TRAPPED_CHEST)) {
             if (!entityDataManager.ownChest(
                     event.clickedBlock.location,
                     playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
@@ -140,6 +141,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             ) {
                 event.player.closeInventory()
                 playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste geöffnet")
+                event.isCancelled = true
             }
         }
     }
