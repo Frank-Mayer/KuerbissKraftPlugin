@@ -44,7 +44,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         val tick = Timer()
         tick.schedule(timerTask {
             onTick()
-        }, 1000, 4000)
+        }, 5000, 10000)
     }
 
     @EventHandler
