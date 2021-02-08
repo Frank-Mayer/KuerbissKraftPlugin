@@ -5,6 +5,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import java.util.*
 import kotlin.concurrent.timerTask
 import kotlin.math.max
@@ -147,6 +149,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                 player.inventory.chestplate = ItemStack(Material.ELYTRA, 1)
                                 player.exp = 0.0f
                                 player.level = 0
+                                player.addPotionEffect(PotionEffect(PotionEffectType.getByName("levitation"), 20000, 1))
                             }
                         }
 
@@ -190,6 +193,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                     player.foodLevel = 20
                                     playerDataManager.resetPlayerData(null)
                                     player.allowFlight = false
+                                    player.removePotionEffect(PotionEffectType.getByName("levitation"))
                                 }
                                 Bukkit.broadcastMessage("${ChatColor.GREEN}Mögen die Spiele beginnen!")
 
