@@ -13,7 +13,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
     private val storeDir = "${Settings.storePath}Entities.json"
     private var loaded = false
     private val chests = hashMapOf<String, String>()
-    private var lastHash:Int = -1
+    private var lastHash: Int = -1
 
     init {
         val path = File(Settings.storePath)
@@ -54,8 +54,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
             fw.close()
             lastHash = hash
             Logger.log("Entity data saved")
-        }
-        else {
+        } else {
             Logger.log("No changes in Entity data")
         }
     }
@@ -78,8 +77,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
         if (value != null) {
             if (value == team) {
                 return true
-            }
-            else {
+            } else {
                 for (player in Bukkit.getOnlinePlayers()) {
                     if (playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(player)) == team) {
                         return false

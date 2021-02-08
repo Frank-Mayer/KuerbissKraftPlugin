@@ -30,7 +30,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     "time" -> {
                         val data = playerDataManager.getPlayerData(Lib.getPlayerIdentifier(sender))
                         if (data != null) {
-                            sender.sendMessage("${ChatColor.AQUA}Deine heutige Online-Zeit: ${ChatColor.YELLOW}${data.dayPlayTime/60}:${data.dayPlayTime%60}")
+                            sender.sendMessage("${ChatColor.AQUA}Deine heutige Online-Zeit: ${ChatColor.YELLOW}${data.dayPlayTime / 60}:${data.dayPlayTime % 60}")
                         } else {
                             sender.sendMessage("${ChatColor.RED}Fehler, keine Daten gefunden")
                         }
