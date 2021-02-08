@@ -23,12 +23,14 @@ class PlayerTrace(
             if (playerData.dayPlayTime >= Settings.maxPlayTime) {
                 timeEnd()
             } else {
-                playerData.dayPlayTime = 0
-                playerData.lastLogout = playerDataManager.today;
                 startTimer()
             }
         } else {
-            startTimer()
+            if (playerData.strikes < 3) {
+                playerData.dayPlayTime = 0
+                playerData.lastLogout = playerDataManager.today
+                startTimer()
+            }
         }
     }
 
