@@ -13,10 +13,10 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.entity.EntityCreatePortalEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -78,8 +78,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun onEntityCreatePortal(event: EntityCreatePortalEvent) {
-        Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}${event.entity.name} hat ein Portal erstellt")
+    fun onPortalCreate(event: PortalCreateEvent) {
+        if (Settings.open) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
