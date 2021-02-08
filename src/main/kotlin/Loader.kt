@@ -89,7 +89,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
                 event.achievement.name.replace(
                     '_',
                     ' '
-                )
+                ).toLowerCase()
             }${ChatColor.AQUA} erziehlt"
         )
     }
