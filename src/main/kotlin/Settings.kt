@@ -7,7 +7,7 @@ object Settings {
     /**
      * Maximum play time per day in seconds
      */
-    const val maxPlayTime: Int = 120
+    const val maxPlayTime: Int = 1800
 
     var open = true
 
