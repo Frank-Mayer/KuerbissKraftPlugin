@@ -151,6 +151,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         if (badLanguageChecker.filter(event.message)) {
             event.message = ""
             playerDataManager.strikePlayer(event.player, "Deine Chat Nachricht ist möglicherweise beleidigend")
+            event.isCancelled = true
         }
     }
 
