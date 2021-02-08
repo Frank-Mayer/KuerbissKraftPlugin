@@ -4,15 +4,5 @@ description: Game management plugin
 main: main.Loader
 
 commands:
-  kurbiss:
-    description: varo options
-  kürbiss:
-    description: varo options
   kuerbiss:
-    description: varo options
-  kurbis:
-    description: varo options
-  kürbis:
-    description: varo options
-  kuerbis:
     description: varo options
