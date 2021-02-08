@@ -17,8 +17,8 @@ object Logger {
     }
 
     fun error(txt: String) {
+        Bukkit.getLogger().log(Level.SEVERE, txt)
         val msg = "${ChatColor.RED}ERROR: $txt"
-        Bukkit.getLogger().log(Level.WARNING, msg)
         for (player in Bukkit.getOnlinePlayers()) {
             if (player.isOp) {
                 player.sendMessage(msg)
