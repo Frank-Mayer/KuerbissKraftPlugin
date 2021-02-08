@@ -154,7 +154,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                             }
                         }
 
-                        var i = 10
+                        var i = 35
 
                         val t = Timer()
                         t.schedule(timerTask {
@@ -215,7 +215,6 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                                 }
                                             }
                                         }
-                                        Settings.quitNotAllowed = false
                                         e.cancel()
                                     }
                                     i--
