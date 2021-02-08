@@ -16,8 +16,10 @@ object Lib {
     }
 
     fun playerCheckIn(player: Player, dataManager: PlayerDataManager): Boolean {
-        if (!Settings.open && !player.isOp) {
-            player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
+        if (!Settings.open) {
+            if (!player.isOp) {
+                player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
+            }
             return false
         }
         val data = dataManager.getPlayerData(getPlayerIdentifier(player))
