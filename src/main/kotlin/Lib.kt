@@ -22,6 +22,20 @@ object Lib {
         }
         val data = dataManager.getPlayerData(getPlayerIdentifier(player))
         if (data != null) {
+            if (data.lastLogout > 1) {
+                val dif = (dataManager.today - data.lastLogout) - 1
+                when {
+                    dif == 1L -> {
+                        dataManager.strikePlayer(player, "Du warst einen Tag nicht online")
+                    }
+                    dif == 2L -> {
+                        dataManager.strikePlayer(player, "Du warst zwei Tage nicht online", 2)
+                    }
+                    dif >= 3L -> {
+                        dataManager.strikePlayer(player, "Du warst viel zu lange nicht online", 3)
+                    }
+                }
+            }
             if (data.lastLogout == dataManager.today && data.dayPlayTime >= Settings.maxPlayTime - 2) {
                 if (player.isOp) {
                     player.gameMode = GameMode.SPECTATOR
