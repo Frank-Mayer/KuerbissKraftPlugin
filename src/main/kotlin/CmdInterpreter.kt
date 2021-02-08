@@ -119,6 +119,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                     }
 
                     "start" -> {
+                        Bukkit.broadcastMessage("${ChatColor.AQUA}Das Event hat begonnen! Der Server darf ab jetzt nicht mehr verlassen werden, bis deine Tageszeit aufgebraucht ist!")
                         Settings.quitNotAllowed = true
 
                         var spawnLoc: IntArray
