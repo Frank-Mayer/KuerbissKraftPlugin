@@ -2,6 +2,7 @@ name: KuerbissKraft
 version: 0.1.0
 description: Game management plugin
 main: main.Loader
+api-version: 1.15
 
 commands:
   kuerbiss:

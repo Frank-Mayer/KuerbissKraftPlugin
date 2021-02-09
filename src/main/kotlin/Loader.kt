@@ -55,7 +55,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun quitEvent(event: PlayerQuitEvent) {
+    fun playerQuit(event: PlayerQuitEvent) {
         playerDataManager.removePlayer(event.player)
         if (Settings.quitNotAllowed) {
             playerDataManager.strikePlayer(event.player, "Du hast den Server während der Startphase verlassen")
@@ -63,9 +63,15 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun playerDeathEvent(event: PlayerDeathEvent) {
+    fun playerDeath(event: PlayerDeathEvent) {
         if (event.entity is Player) {
-            playerDataManager.excludePlayer(event.entity, event.deathMessage)
+            event.keepInventory = true
+            event.keepLevel = true
+            if (event.deathMessage != null) {
+                playerDataManager.excludePlayer(event.entity, event.deathMessage!!)
+            } else {
+                playerDataManager.excludePlayer(event.entity, "${event.entity.name} ist gestorben")
+            }
         }
     }
 
@@ -84,14 +90,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun onPlayerAchievementAwarded(event: PlayerAchievementAwardedEvent) {
+    fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) {
         Bukkit.broadcastMessage(
-            "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${
-                event.achievement.name.replace(
-                    '_',
-                    ' '
-                ).toLowerCase()
-            }${ChatColor.AQUA} erziehlt"
+            "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${event.advancement.key.key}${ChatColor.AQUA} erziehlt"
         )
     }
 
@@ -134,9 +135,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onInventoryOpen(event: PlayerInteractEvent) {
-        if (event.action == Action.RIGHT_CLICK_BLOCK && (event.clickedBlock.type == Material.CHEST || event.clickedBlock.type == Material.TRAPPED_CHEST)) {
+        if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock != null && (event.clickedBlock!!.type == Material.CHEST || event.clickedBlock!!.type == Material.TRAPPED_CHEST)) {
             if (!entityDataManager.ownChest(
-                    event.clickedBlock.location,
+                    event.clickedBlock!!.location,
                     playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
                 )
             ) {

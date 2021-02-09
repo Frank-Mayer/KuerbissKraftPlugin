@@ -12,7 +12,11 @@ object Lib {
     }
 
     fun getPlayerIdentifier(player: OfflinePlayer): String {
-        return player.name
+        if (player.name != null) {
+            return player.name!!
+        } else {
+            return player.uniqueId.toString()
+        }
     }
 
     fun playerCheckIn(player: Player, dataManager: PlayerDataManager): Boolean {

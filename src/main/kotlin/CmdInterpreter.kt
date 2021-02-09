@@ -98,21 +98,20 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
 
                     "portal" -> {
                         with(Bukkit.getWorld("world")) {
-                            val spawnLoc = intArrayOf(
-                                spawnLocation.blockX,
-                                getHighestBlockYAt(spawnLocation.blockX, spawnLocation.blockZ),
-                                spawnLocation.blockZ
-                            )
-                            for (x in 0 until 4) {
-                                for (y in 0 until 5) {
-                                    getBlockAt(spawnLoc[0] + x, spawnLoc[1] + y, spawnLoc[2]).type =
-                                        Material.OBSIDIAN
+                            if (this != null) {
+                                val spawnLoc = intArrayOf(
+                                    spawnLocation.blockX,
+                                    getHighestBlockYAt(spawnLocation.blockX, spawnLocation.blockZ),
+                                    spawnLocation.blockZ
+                                )
+                                for (x in 0 until 4) {
+                                    for (y in 0 until 5) {
+                                        getBlockAt(spawnLoc[0] + x, spawnLoc[1] + y, spawnLoc[2]).type =
+                                            Material.OBSIDIAN
+                                    }
                                 }
-                            }
-                            for (x in 1 until 3) {
-                                for (y in 1 until 4) {
-                                    getBlockAt(spawnLoc[0] + x, spawnLoc[1] + y, spawnLoc[2]).type = Material.PORTAL
-                                }
+                            } else {
+                                Logger.error("Could not build portal, world is null")
                             }
                         }
                         return true
@@ -124,18 +123,31 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
 
                         var spawnLoc: IntArray
                         with(Bukkit.getWorld("world")) {
-                            spawnLoc = intArrayOf(
-                                spawnLocation.blockX,
-                                getHighestBlockYAt(spawnLocation.blockX, spawnLocation.blockZ),
-                                spawnLocation.blockZ
-                            )
+                            if (this != null) {
+                                spawnLoc = intArrayOf(
+                                    spawnLocation.blockX,
+                                    getHighestBlockYAt(spawnLocation.blockX, spawnLocation.blockZ),
+                                    spawnLocation.blockZ
+                                )
+                            } else {
+                                spawnLoc = intArrayOf(
+                                    0,
+                                    200,
+                                    0
+                                )
+                                Logger.error("Could not set start location, world is null")
+                            }
                         }
 
                         // Set default world settings
+                        GameRule.ANNOUNCE_ADVANCEMENTS
                         for (world in Bukkit.getWorlds()) {
-                            world.setGameRuleValue("logAdminCommands", "false")
-                            world.setGameRuleValue("showDeathMessages", "true")
-                            world.setGameRuleValue("announceAdvancements", "false")
+                            world.setGameRule(GameRule.LOG_ADMIN_COMMANDS, false)
+                            world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, true)
+                            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
+                            world.setGameRule(GameRule.DO_PATROL_SPAWNING, true)
+                            world.setGameRule(GameRule.KEEP_INVENTORY, true)
+                            world.setGameRule(GameRule.DO_LIMITED_CRAFTING, false)
                             world.difficulty = Difficulty.EASY
                             world.fullTime = 0
                         }
@@ -150,7 +162,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                 player.inventory.chestplate = ItemStack(Material.ELYTRA, 1)
                                 player.exp = 0.0f
                                 player.level = 0
-                                player.addPotionEffect(PotionEffect(PotionEffectType.getByName("levitation"), 20000, 1))
+                                player.addPotionEffect(PotionEffect(PotionEffectType.LEVITATION, 20000, 1))
                             }
                         }
 
@@ -186,15 +198,18 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
 
                             // Timer ended
                             if (i <= 0) {
-                                for (player in players) {
-                                    player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 0.75F, 1.0F)
-                                    player.closeInventory()
-                                    player.gameMode = GameMode.SURVIVAL
-                                    player.health = player.maxHealth
-                                    player.foodLevel = 20
-                                    playerDataManager.resetPlayerData(null)
-                                    player.allowFlight = false
-                                    player.removePotionEffect(PotionEffectType.getByName("levitation"))
+                                Bukkit.getScheduler().callSyncMethod(plugin) {
+                                    for (player in players) {
+                                        player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F)
+                                        player.playSound(player.location, Sound.EVENT_RAID_HORN, 1.0F, 1.0F)
+                                        player.closeInventory()
+                                        player.gameMode = GameMode.SURVIVAL
+                                        player.health = 20.0
+                                        player.foodLevel = 20
+                                        playerDataManager.resetPlayerData(null)
+                                        player.allowFlight = false
+                                        player.removePotionEffect(PotionEffectType.LEVITATION)
+                                    }
                                 }
                                 Bukkit.broadcastMessage("${ChatColor.GREEN}Mögen die Spiele beginnen!")
 

@@ -1,21 +1,22 @@
 package main
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import main.data.PlayerData
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.Team
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -25,6 +26,7 @@ class PlayerDataManager : KoinComponent {
     private val playersTracer = HashMap<String, PlayerTrace>()
     private val playersData = HashMap<String, PlayerData>()
     private val scoreboard = Bukkit.getScoreboardManager()?.mainScoreboard
+    private val plugin = inject<Plugin>().value
     private val storeDir = "${Settings.storePath}Players.json"
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
@@ -94,11 +96,14 @@ class PlayerDataManager : KoinComponent {
         getPlayerData(Lib.getPlayerIdentifier(player))?.alive = false
         Bukkit.broadcastMessage("${ChatColor.YELLOW}${player.name}${ChatColor.AQUA} ist aus dem Spiel ausgeschieden")
         if (player.isOnline) {
-            player.kickPlayer(reason)
-            for (p in Bukkit.getOnlinePlayers()) {
-                p.playSound(p.location, Sound.ENTITY_LIGHTNING_THUNDER, 1.0F, 0.8F)
+            Bukkit.getScheduler().callSyncMethod(plugin) {
+                player.kickPlayer("Du wurdest aus dem Spiel ausgeschlossen!\n${reason}")
+                for (p in Bukkit.getOnlinePlayers()) {
+                    p.playSound(p.location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 0.8F)
+                }
             }
         }
+        checkGameEnd()
     }
 
     /**
@@ -156,41 +161,18 @@ class PlayerDataManager : KoinComponent {
      * Load players data from disc
      */
     fun loadData() {
+        val gson = Gson()
         Logger.log("Importing data from Disc")
         // Read string
         val fr = FileReader(storeDir)
         val json = fr.readText()
         fr.close()
-        // Parse Json
-        val parser = JSONParser()
-        val players = parser.parse(json) as JSONArray
-        // Loop Json-Array
-        for (playerDta in players) {
-            val player = playerDta as JSONObject
-            val playerId = player["id"] as String
-            // Player data existent?
-            if (playersData.containsKey(playerId)) {
-                val p = playersData[playerId]
-                if (p != null) {
-                    p.id = playerId
-                    p.teamName = player["teamName"] as String
-                    p.strikes = player["strikes"] as Long
-                    p.lastLogout = player["lastLogout"] as Long
-                    p.dayPlayTime = player["dayPlayTime"] as Long
-                    p.textures = player["textures"] as String
-                    p.alive = player["alive"] as Boolean
-                }
-            } else {
-                val p = PlayerData()
-                p.id = playerId
-                p.teamName = player["teamName"] as String
-                p.strikes = player["strikes"] as Long
-                p.lastLogout = player["lastLogout"] as Long
-                p.dayPlayTime = player["dayPlayTime"] as Long
-                p.textures = player["textures"] as String
-                p.alive = player["alive"] as Boolean
-                playersData[playerId] = p
-            }
+
+        // Parse json
+        val type: Type = object : TypeToken<List<PlayerData>>() {}.type
+        val impArr: List<PlayerData> = gson.fromJson(json, type)
+        for (el in impArr) {
+            playersData[el.id] = el
         }
         Logger.log("Data imported")
         loaded = true
@@ -252,5 +234,20 @@ class PlayerDataManager : KoinComponent {
         player.addPotionEffect(PotionEffect(PotionEffectType.FIRE_RESISTANCE, 200, 3))
         player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 5))
         player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 5))
+    }
+
+    /**
+     * Check if there is only one team left
+     */
+    fun checkGameEnd() {
+        val aliveTeams = setOf<String>()
+        for (player in playersData) {
+            if (player.value.alive && (player.value.strikes + (today - player.value.lastLogout - 1)) < 3) {
+                aliveTeams.plus(player.value.teamName)
+            }
+        }
+        if (aliveTeams.count() == 1) {
+            Bukkit.broadcastMessage("Team ${aliveTeams.any()} hat KürbissKraft gewonnen")
+        }
     }
 }
