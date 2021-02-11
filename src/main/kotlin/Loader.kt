@@ -30,6 +30,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var cmdInterpreter: CmdInterpreter
     private lateinit var entityDataManager: EntityDataManager
     private lateinit var badLanguageChecker: BadLanguageChecker
+    private lateinit var entryProtector: EntryProtector
 
     override fun onEnable() {
         registerModules()
@@ -37,6 +38,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         entityDataManager = inject<EntityDataManager>().value
         cmdInterpreter = inject<CmdInterpreter>().value
         badLanguageChecker = inject<BadLanguageChecker>().value
+        entryProtector = inject<EntryProtector>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -51,6 +53,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
             event.player.sendMessage("${ChatColor.AQUA}Nutze die /kurbiss <option> commands um aktuelle Informationen zu erhalten\nstrikes: Zeigt wie viele Strikes du hast\ntime: zeigt deine aktuelle Online-Zeit an")
+            entryProtector.protect(event.player.location)
         }
     }
 
@@ -90,10 +93,24 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
+    fun onPortal(event: PlayerPortalEvent) {
+        Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}Portaled")
+        if (event.to != null) {
+            entryProtector.protect(event.to!!)
+        }
+        else {
+            Logger.log("Could not protect ${event.player.name}, target location is null")
+        }
+    }
+
+    @EventHandler
     fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) {
-        Bukkit.broadcastMessage(
-            "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${event.advancement.key.key}${ChatColor.AQUA} erziehlt"
-        )
+        val key = event.advancement.key.key
+        if ("recipe" !in key) {
+            Bukkit.broadcastMessage(
+                "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${key.split('/').last().replace('_', ' ')}${ChatColor.AQUA} erziehlt"
+            )
+        }
     }
 
     @EventHandler
@@ -121,6 +138,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
                 event.isCancelled = true
             }
         }
+        else if (event.block.type == Material.NETHER_PORTAL) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
@@ -134,7 +154,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     @EventHandler
-    fun onInventoryOpen(event: PlayerInteractEvent) {
+    fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock != null && (event.clickedBlock!!.type == Material.CHEST || event.clickedBlock!!.type == Material.TRAPPED_CHEST)) {
             if (!entityDataManager.ownChest(
                     event.clickedBlock!!.location,
@@ -178,6 +198,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { CmdInterpreter(get(), get()) }
             single { EntityDataManager(get()) }
             single { BadLanguageChecker() }
+            single { EntryProtector() }
         }
 
         startKoin {
