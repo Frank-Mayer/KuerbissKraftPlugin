@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.set
+import kotlin.concurrent.timerTask
 
 class PlayerDataManager : KoinComponent {
     private val playersTracer = HashMap<String, PlayerTrace>()
@@ -241,15 +242,22 @@ class PlayerDataManager : KoinComponent {
     /**
      * Check if there is only one team left
      */
-    fun checkGameEnd() {
-        val aliveTeams = setOf<String>()
+    fun checkGameEnd(): Int {
+        val aliveTeams = mutableSetOf<String>()
         for (player in playersData) {
             if (player.value.alive && (player.value.strikes + (today - player.value.lastLogout - 1)) < 3) {
-                aliveTeams.plus(player.value.teamName)
+                aliveTeams.add(player.value.teamName)
             }
         }
-        if (aliveTeams.count() == 1) {
-            Bukkit.broadcastMessage("Team ${aliveTeams.any()} hat KürbissKraft gewonnen")
+        val count = aliveTeams.size
+        if (count == 1) {
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.kickPlayer("${ChatColor.AQUA}Team ${ChatColor.YELLOW}${aliveTeams.first()}${ChatColor.AQUA} hat KürbissKraft gewonnen")
+            }
+            Timer().schedule(timerTask {
+                Bukkit.shutdown()
+            }, 3000)
         }
+        return count
     }
 }
