@@ -3,6 +3,7 @@ version: 0.1.0
 description: Game management plugin
 main: main.Loader
 api-version: 1.15
+author: Frank Mayer
 
 commands:
   kuerbiss:
