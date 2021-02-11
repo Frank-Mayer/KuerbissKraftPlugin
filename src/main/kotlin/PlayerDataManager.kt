@@ -152,7 +152,9 @@ class PlayerDataManager : KoinComponent {
                         )
                     }"
                 )
-                player.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200, 1))
+                Bukkit.getScheduler().callSyncMethod(plugin) {
+                    player.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200, 1))
+                }
             }
         }
     }
