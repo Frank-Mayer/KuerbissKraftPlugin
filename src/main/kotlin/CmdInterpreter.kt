@@ -1,6 +1,7 @@
 package main
 
 import org.bukkit.*
+import org.bukkit.advancement.Advancement
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -110,6 +111,12 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                             Material.OBSIDIAN
                                     }
                                 }
+                                for (x in 1 until 3) {
+                                    for (y in 1 until 4) {
+                                        getBlockAt(spawnLoc[0] + x, spawnLoc[1] + y, spawnLoc[2]).type =
+                                            Material.AIR
+                                    }
+                                }
                             } else {
                                 Logger.error("Could not build portal, world is null")
                             }
@@ -160,9 +167,8 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                 player.gameMode = GameMode.ADVENTURE
                                 player.inventory.clear()
                                 player.inventory.chestplate = ItemStack(Material.ELYTRA, 1)
-                                player.exp = 0.0f
-                                player.level = 0
                                 player.addPotionEffect(PotionEffect(PotionEffectType.LEVITATION, 20000, 1))
+                                player.addPotionEffect(PotionEffect(PotionEffectType.SLOW_FALLING, 20000, 2))
                             }
                         }
 
@@ -204,11 +210,14 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                         player.playSound(player.location, Sound.EVENT_RAID_HORN, 1.0F, 1.0F)
                                         player.closeInventory()
                                         player.gameMode = GameMode.SURVIVAL
+                                        player.level = 0
+                                        player.exp = 0.0f
                                         player.health = 20.0
                                         player.foodLevel = 20
                                         playerDataManager.resetPlayerData(null)
                                         player.allowFlight = false
                                         player.removePotionEffect(PotionEffectType.LEVITATION)
+                                        player.removePotionEffect(PotionEffectType.SLOW_FALLING)
                                     }
                                 }
                                 Bukkit.broadcastMessage("${ChatColor.GREEN}Mögen die Spiele beginnen!")
