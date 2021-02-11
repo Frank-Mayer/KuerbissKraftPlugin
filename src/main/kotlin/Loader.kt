@@ -105,7 +105,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) {
-        val key = event.advancement.key.key
+        val key = event.advancement.key.key.replace("/root", "")
         if ("recipe" !in key) {
             Bukkit.broadcastMessage(
                 "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${key.split('/').last().replace('_', ' ')}${ChatColor.AQUA} erziehlt"
