@@ -3,6 +3,7 @@ package main
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -98,8 +99,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}Portaled")
         if (event.to != null) {
             entryProtector.protect(event.to!!)
-        }
-        else {
+        } else {
             Logger.log("Could not protect ${event.player.name}, target location is null")
         }
     }
@@ -109,7 +109,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         val key = event.advancement.key.key.replace("/root", "")
         if ("recipe" !in key) {
             Bukkit.broadcastMessage(
-                "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${key.split('/').last().replace('_', ' ')}${ChatColor.AQUA} erziehlt"
+                "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${
+                    key.split('/').last().replace('_', ' ')
+                }${ChatColor.AQUA} erziehlt"
             )
         }
     }
@@ -138,8 +140,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
                 playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
                 event.isCancelled = true
             }
-        }
-        else if (event.block.type == Material.NETHER_PORTAL) {
+        } else if (event.block.type == Material.NETHER_PORTAL) {
             event.isCancelled = true
         }
     }
@@ -156,14 +157,21 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock != null && (event.clickedBlock!!.type == Material.CHEST || event.clickedBlock!!.type == Material.TRAPPED_CHEST)) {
-            if (!entityDataManager.ownChest(
-                    event.clickedBlock!!.location,
-                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
-                )
+        if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock != null) {
+            if (event.clickedBlock!!.type == Material.CHEST || event.clickedBlock!!.type == Material.TRAPPED_CHEST) {
+                if (!entityDataManager.ownChest(
+                        event.clickedBlock!!.location,
+                        playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                    )
+                ) {
+                    event.player.closeInventory()
+                    playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste geöffnet")
+                    event.isCancelled = true
+                }
+            } else if (
+                (event.clickedBlock!!.location.world != null && event.clickedBlock!!.location.world!!.environment != World.Environment.NETHER) &&
+                (event.clickedBlock!!.type == Material.BLACK_BED || event.clickedBlock!!.type == Material.BLUE_BED || event.clickedBlock!!.type == Material.BROWN_BED || event.clickedBlock!!.type == Material.CYAN_BED || event.clickedBlock!!.type == Material.GRAY_BED || event.clickedBlock!!.type == Material.GREEN_BED || event.clickedBlock!!.type == Material.LIGHT_BLUE_BED || event.clickedBlock!!.type == Material.LIGHT_GRAY_BED || event.clickedBlock!!.type == Material.LIME_BED || event.clickedBlock!!.type == Material.MAGENTA_BED || event.clickedBlock!!.type == Material.ORANGE_BED || event.clickedBlock!!.type == Material.PINK_BED || event.clickedBlock!!.type == Material.PURPLE_BED || event.clickedBlock!!.type == Material.RED_BED || event.clickedBlock!!.type == Material.WHITE_BED || event.clickedBlock!!.type == Material.YELLOW_BED)
             ) {
-                event.player.closeInventory()
-                playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste geöffnet")
                 event.isCancelled = true
             }
         }
