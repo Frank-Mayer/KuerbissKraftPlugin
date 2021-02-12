@@ -233,12 +233,6 @@ class PlayerDataManager : KoinComponent {
         }
     }
 
-    fun loginProtection(player: Player) {
-        player.addPotionEffect(PotionEffect(PotionEffectType.FIRE_RESISTANCE, 200, 3))
-        player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 5))
-        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 5))
-    }
-
     /**
      * Check if there is only one team left
      */

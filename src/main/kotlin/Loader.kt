@@ -53,6 +53,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
             event.player.sendMessage("${ChatColor.AQUA}Nutze die /kurbiss <option> commands um aktuelle Informationen zu erhalten\nstrikes: Zeigt wie viele Strikes du hast\ntime: zeigt deine aktuelle Online-Zeit an")
+            entryProtector.login(event.player)
             entryProtector.protect(event.player.location)
         }
     }

@@ -4,6 +4,9 @@ import com.google.common.collect.Sets.newHashSet
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 class EntryProtector {
     private val dangerousBlocks = newHashSet(
@@ -44,6 +47,12 @@ class EntryProtector {
         Material.SEAGRASS,
         Material.TALL_SEAGRASS
     )
+
+    fun login(player: Player) {
+        player.addPotionEffect(PotionEffect(PotionEffectType.FIRE_RESISTANCE, 200, 3))
+        player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 5))
+        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 5))
+    }
 
     fun protect(location: Location) {
         for (y in 0 until 3) {
