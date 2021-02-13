@@ -96,7 +96,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPortal(event: PlayerPortalEvent) {
-        Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}Portaled")
         if (event.to != null) {
             entryProtector.protect(event.to!!)
         } else {
