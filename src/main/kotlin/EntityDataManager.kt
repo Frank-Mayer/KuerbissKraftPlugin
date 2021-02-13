@@ -44,6 +44,7 @@ class EntityDataManager(private val playerDataManager: PlayerDataManager) {
     fun storeData() {
         if (!loaded) {
             loadData()
+            return
         }
         val gson = Gson()
         val json = gson.toJson(chests)

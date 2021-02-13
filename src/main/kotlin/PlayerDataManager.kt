@@ -188,6 +188,7 @@ class PlayerDataManager : KoinComponent {
     fun storeData() {
         if (!loaded) {
             loadData()
+            return
         }
         val gson = Gson()
         val jsonSB = StringBuilder()
