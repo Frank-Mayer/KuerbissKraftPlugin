@@ -53,8 +53,10 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                         Bukkit.savePlayers()
                         // Kick all players
                         val players = Bukkit.getOnlinePlayers()
-                        for (player in players) {
-                            player.kickPlayer("Ein Admin hat alle vom Server gekickt\nMuss wohl dringend sein ;)")
+                        Bukkit.getScheduler().callSyncMethod(plugin) {
+                            for (player in players) {
+                                player.kickPlayer("Ein Admin hat alle vom Server gekickt\nMuss wohl dringend sein ;)")
+                            }
                         }
                         Timer().schedule(timerTask {
                             Bukkit.shutdown()
@@ -79,9 +81,11 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
 
                     "close" -> {
                         Settings.open = false
-                        for (player in Bukkit.getOnlinePlayers()) {
-                            if (!player.isOp) {
-                                player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
+                        Bukkit.getScheduler().callSyncMethod(plugin) {
+                            for (player in Bukkit.getOnlinePlayers()) {
+                                if (!player.isOp) {
+                                    player.kickPlayer("Der Server ist vorübergehend nur für Admins zugänglich")
+                                }
                             }
                         }
                         return true
