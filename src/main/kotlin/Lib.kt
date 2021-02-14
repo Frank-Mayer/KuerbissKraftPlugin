@@ -12,10 +12,10 @@ object Lib {
     }
 
     fun getPlayerIdentifier(player: OfflinePlayer): String {
-        if (player.name != null) {
-            return player.name!!
+        return if (player.name != null) {
+            player.name!!
         } else {
-            return player.uniqueId.toString()
+            player.uniqueId.toString()
         }
     }
 
