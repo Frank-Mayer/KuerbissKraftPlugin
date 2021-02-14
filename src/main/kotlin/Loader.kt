@@ -73,14 +73,12 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun playerDeath(event: PlayerDeathEvent) {
-        if (event.entity is Player) {
-            event.keepInventory = true
-            event.keepLevel = true
-            if (event.deathMessage != null) {
-                playerDataManager.excludePlayer(event.entity, event.deathMessage!!)
-            } else {
-                playerDataManager.excludePlayer(event.entity, "${event.entity.name} ist gestorben")
-            }
+        event.keepInventory = true
+        event.keepLevel = true
+        if (event.deathMessage != null) {
+            playerDataManager.excludePlayer(event.entity, event.deathMessage!!)
+        } else {
+            playerDataManager.excludePlayer(event.entity, "${event.entity.name} ist gestorben")
         }
     }
 
