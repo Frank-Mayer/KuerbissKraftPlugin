@@ -247,10 +247,19 @@ class PlayerDataManager : KoinComponent {
         val count = aliveTeams.size
         if (count == 1) {
             for (player in Bukkit.getOnlinePlayers()) {
-                player.kickPlayer("${ChatColor.AQUA}Team ${ChatColor.YELLOW}${aliveTeams.first()}${ChatColor.AQUA} hat KürbissKraft gewonnen")
+                player.playSound(player.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f)
             }
             Timer().schedule(timerTask {
-                Bukkit.shutdown()
+                Bukkit.getScheduler().callSyncMethod(plugin) {
+                    for (player in Bukkit.getOnlinePlayers()) {
+                        player.kickPlayer("${ChatColor.AQUA}Team ${ChatColor.YELLOW}${aliveTeams.first()}${ChatColor.AQUA} hat KürbissKraft gewonnen")
+                    }
+                }
+                Timer().schedule(timerTask {
+                    Bukkit.getScheduler().callSyncMethod(plugin) {
+                        Bukkit.shutdown()
+                    }
+                }, 3000)
             }, 3000)
         }
         return count
