@@ -7,7 +7,6 @@ import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -19,6 +18,7 @@ import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -26,6 +26,8 @@ import org.koin.dsl.module
 import java.util.*
 import kotlin.concurrent.timerTask
 
+
+@KoinApiExtension
 class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var playerDataManager: PlayerDataManager
     private lateinit var cmdInterpreter: CmdInterpreter
