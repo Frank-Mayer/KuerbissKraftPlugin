@@ -33,6 +33,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var badLanguageChecker: BadLanguageChecker
     private lateinit var entryProtector: EntryProtector
     private lateinit var oreManager: OreManager
+    private lateinit var translator: Translator
 
     override fun onEnable() {
         registerModules()
@@ -42,6 +43,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         badLanguageChecker = inject<BadLanguageChecker>().value
         entryProtector = inject<EntryProtector>().value
         oreManager = inject<OreManager>().value
+        translator = inject<Translator>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -107,12 +109,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) {
-        val key = event.advancement.key.key.replace("/root", "")
-        if ("recipe" !in key) {
+        val name = translator.getAdvancementName(event.advancement.key.key)
+        if (name != null) {
             Bukkit.broadcastMessage(
-                "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}${
-                    key.split('/').last().replace('_', ' ')
-                }${ChatColor.AQUA} erziehlt"
+                "${ChatColor.AQUA}Ein Spieler hat den Erfolg ${ChatColor.YELLOW}[$name]${ChatColor.AQUA} erzielt"
             )
         }
     }
@@ -217,6 +217,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { BadLanguageChecker() }
             single { EntryProtector() }
             single { OreManager(get()) }
+            single { Translator() }
         }
 
         startKoin {
