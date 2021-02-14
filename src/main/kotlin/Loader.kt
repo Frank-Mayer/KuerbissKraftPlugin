@@ -103,7 +103,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         if (event.to != null) {
             entryProtector.protect(event.to!!)
         } else {
-            Logger.log("Could not protect ${event.player.name}, target location is null")
+            Logger.error("Could not protect ${event.player.name}, target location is null")
         }
     }
 
