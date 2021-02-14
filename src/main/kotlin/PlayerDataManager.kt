@@ -94,16 +94,37 @@ class PlayerDataManager : KoinComponent {
      */
     fun excludePlayer(player: Player, reason: String) {
 //        Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
+        val team = getPlayerTeam(Lib.getPlayerIdentifier(player))
+        var teammateAlive = false
+        for (player in playersData) {
+            if (player.value.alive && (player.value.strikes + (today - player.value.lastLogout - 1)) < 3) {
+                if (player.value.teamName == team) {
+                    teammateAlive = true
+                    break
+                }
+            }
+        }
         getPlayerData(Lib.getPlayerIdentifier(player))?.alive = false
-        Bukkit.broadcastMessage("${ChatColor.YELLOW}${player.name}${ChatColor.AQUA} ist aus dem Spiel ausgeschieden")
+        if (teammateAlive) {
+            Bukkit.broadcastMessage("${ChatColor.YELLOW}[$team] ${player.name}${ChatColor.AQUA} ist gestorben")
+        }
+        else {
+            Bukkit.broadcastMessage("${ChatColor.YELLOW}[$team] ${player.name}${ChatColor.AQUA} ist gestorben, Team ${ChatColor.YELLOW}$team${ChatColor.AQUA} ist aus dem Spiel ausgeschieden")
+        }
         if (player.isOnline) {
             Bukkit.getScheduler().callSyncMethod(plugin) {
-                player.kickPlayer("Du wurdest aus dem Spiel ausgeschlossen!\n${reason}")
+                val teamMessage = if (teammateAlive) {
+                    "Dein Teampartner ist nun auf sich gestellt"
+                } else {
+                    "Team $team ist somit aus dem Spiel ausgeschieden"
+                }
+                player.kickPlayer("Du bist durch deinen Tod aus dem Spiel ausgeschlossen!\n$reason\n${ChatColor.RESET}$teamMessage")
                 for (p in Bukkit.getOnlinePlayers()) {
                     p.playSound(p.location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 0.8F)
                 }
             }
         }
+
         checkGameEnd()
     }
 
