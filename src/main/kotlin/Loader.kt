@@ -204,6 +204,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private fun onTick() {
         playerDataManager.storeData()
         entityDataManager.storeData()
+        oreManager.storeData()
     }
 
     private fun registerModules() {
