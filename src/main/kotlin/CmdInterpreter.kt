@@ -1,7 +1,6 @@
 package main
 
 import org.bukkit.*
-import org.bukkit.advancement.Advancement
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -218,6 +217,14 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                         player.allowFlight = false
                                         player.removePotionEffect(PotionEffectType.LEVITATION)
                                         player.removePotionEffect(PotionEffectType.SLOW_FALLING)
+
+                                        val iterator = Bukkit.getServer().advancementIterator()
+                                        while (iterator.hasNext()) {
+                                            val progress = player.getAdvancementProgress(iterator.next())
+                                            for (criteria in progress.awardedCriteria) {
+                                                progress.revokeCriteria(criteria!!)
+                                            }
+                                        }
                                     }
                                 }
                                 Bukkit.broadcastMessage("${ChatColor.GREEN}Mögen die Spiele beginnen!")
