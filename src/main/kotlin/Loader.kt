@@ -32,6 +32,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var entityDataManager: EntityDataManager
     private lateinit var badLanguageChecker: BadLanguageChecker
     private lateinit var entryProtector: EntryProtector
+    private lateinit var oreManager: OreManager
 
     override fun onEnable() {
         registerModules()
@@ -40,6 +41,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         cmdInterpreter = inject<CmdInterpreter>().value
         badLanguageChecker = inject<BadLanguageChecker>().value
         entryProtector = inject<EntryProtector>().value
+        oreManager = inject<OreManager>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -130,17 +132,19 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
-            if (!entityDataManager.removeChest(
-                    event.block.location,
-                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
-                )
-            ) {
-                playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
+        if (!oreManager.mine(event.block, event.player.inventory.itemInMainHand)) {
+            if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
+                if (!entityDataManager.removeChest(
+                        event.block.location,
+                        playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                    )
+                ) {
+                    playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
+                    event.isCancelled = true
+                }
+            } else if (event.block.type == Material.NETHER_PORTAL) {
                 event.isCancelled = true
             }
-        } else if (event.block.type == Material.NETHER_PORTAL) {
-            event.isCancelled = true
         }
     }
 
@@ -207,6 +211,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { EntityDataManager(get()) }
             single { BadLanguageChecker() }
             single { EntryProtector() }
+            single { OreManager(get()) }
         }
 
         startKoin {
