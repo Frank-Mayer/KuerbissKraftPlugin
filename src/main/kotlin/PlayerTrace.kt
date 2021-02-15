@@ -65,6 +65,7 @@ class PlayerTrace(
         val delay = Timer()
         delay.schedule(timerTask {
             Bukkit.getScheduler().callSyncMethod(plugin) {
+                Settings.quitNotAllowed = false
                 controlledPlayer.kickPlayer("Deine Tageszeit ist aufgebraucht")
             }
         }, 1000)

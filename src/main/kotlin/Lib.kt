@@ -43,6 +43,7 @@ object Lib {
                 if (player.isOp) {
                     player.gameMode = GameMode.SPECTATOR
                 } else {
+                    Settings.quitNotAllowed = false
                     player.kickPlayer("Deine Tageszeit ist aufgebraucht")
                 }
                 return false
