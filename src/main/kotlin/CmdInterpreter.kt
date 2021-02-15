@@ -127,8 +127,23 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                         return true
                     }
 
+                    "pause" -> {
+                        if (args.count() >= 2) {
+                            Settings.pause = args[1] == "true"
+                            if (Settings.pause) {
+                                sender.sendMessage("now paused")
+                            } else {
+                                sender.sendMessage("now unpaused")
+                            }
+                        } else {
+                            sender.sendMessage("Settings.pause is currently set to: ${Settings.pause}")
+                        }
+                        return true
+                    }
+
                     "start" -> {
                         Bukkit.broadcastMessage("${ChatColor.AQUA}Das Event hat begonnen! Der Server darf ab jetzt nicht mehr verlassen werden, bis deine Tageszeit aufgebraucht ist!")
+                        Settings.pause = false
                         Settings.quitNotAllowed = true
 
                         var spawnLoc: IntArray

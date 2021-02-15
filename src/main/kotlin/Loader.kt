@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
@@ -51,6 +52,20 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         tick.schedule(timerTask {
             onTick()
         }, 5000, 10000)
+    }
+
+    @EventHandler
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        if (Settings.pause) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
+        if (Settings.pause) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
@@ -131,7 +146,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location))) {
+        if (Settings.pause || (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location)))) {
             event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts abbauen, das dient zum Schutz des Netherportals")
             event.isCancelled = true
             return
@@ -153,7 +168,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-        if (Settings.open && Lib.isPortalNearby(event.block.location)) {
+        if (Settings.pause || (Settings.open && Lib.isPortalNearby(event.block.location))) {
             event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts setzen, das dient zum Schutz des Netherportals")
             event.isCancelled = true
             return

@@ -12,4 +12,5 @@ object Settings {
     var open = true
 
     var quitNotAllowed = false
+    var pause = false
 }
