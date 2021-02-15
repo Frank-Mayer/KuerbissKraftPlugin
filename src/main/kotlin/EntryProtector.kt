@@ -56,11 +56,11 @@ class EntryProtector {
 
     fun protect(location: Location) {
         for (y in 0 until 3) {
-                val loc = Location(location.world, location.x, location.y + y, location.z)
-                if (!enterableBlocks.contains(loc.block.type)) {
-                    Bukkit.broadcastMessage("Removed not enterable Block ${loc.block.type}")
-                    loc.block.type = Material.AIR
-                }
+            val loc = Location(location.world, location.x, location.y + y, location.z)
+            if (!enterableBlocks.contains(loc.block.type)) {
+                Bukkit.broadcastMessage("Removed not enterable Block ${loc.block.type}")
+                loc.block.type = Material.AIR
+            }
         }
         for (x in -1 until 2) {
             for (y in 0 until 3) {

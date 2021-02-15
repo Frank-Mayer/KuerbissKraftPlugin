@@ -107,8 +107,7 @@ class PlayerDataManager : KoinComponent {
         getPlayerData(Lib.getPlayerIdentifier(player))?.alive = false
         if (teammateAlive) {
             Bukkit.broadcastMessage("${ChatColor.YELLOW}[$team] ${player.name}${ChatColor.AQUA} ist gestorben")
-        }
-        else {
+        } else {
             Bukkit.broadcastMessage("${ChatColor.YELLOW}[$team] ${player.name}${ChatColor.AQUA} ist gestorben, Team ${ChatColor.YELLOW}$team${ChatColor.AQUA} ist aus dem Spiel ausgeschieden")
         }
         if (player.isOnline) {

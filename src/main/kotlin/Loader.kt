@@ -9,7 +9,10 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.*
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageEvent
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -114,7 +117,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onEntityExplode(event: EntityExplodeEvent) {
         for (block in event.blockList()) {
-            if (block.type == Material.NETHER_PORTAL || block.type == Material.CHEST  || block.type == Material.TRAPPED_CHEST) {
+            if (block.type == Material.NETHER_PORTAL || block.type == Material.CHEST || block.type == Material.TRAPPED_CHEST) {
                 event.isCancelled = true
                 return
             }
@@ -152,7 +155,12 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             return
         }
 
-        if (!oreManager.mine(event.block, event.player.inventory.itemInMainHand, Lib.getPlayerIdentifier(event.player))) {
+        if (!oreManager.mine(
+                event.block,
+                event.player.inventory.itemInMainHand,
+                Lib.getPlayerIdentifier(event.player)
+            )
+        ) {
             if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
                 if (!entityDataManager.removeChest(
                         event.block.location,
