@@ -132,6 +132,12 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
+        if (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location))) {
+            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts abbauen, das dient zum Schutz des Netherportals")
+            event.isCancelled = true
+            return
+        }
+
         if (!oreManager.mine(event.block, event.player.inventory.itemInMainHand)) {
             if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
                 if (!entityDataManager.removeChest(
@@ -142,14 +148,18 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
                     playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
                     event.isCancelled = true
                 }
-            } else if (event.block.type == Material.NETHER_PORTAL) {
-                event.isCancelled = true
             }
         }
     }
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
+        if (Settings.open && Lib.isPortalNearby(event.block.location)) {
+            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts setzen, das dient zum Schutz des Netherportals")
+            event.isCancelled = true
+            return
+        }
+
         if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
             entityDataManager.addChest(
                 event.block.location,

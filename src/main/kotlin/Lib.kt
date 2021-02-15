@@ -1,9 +1,6 @@
 package main
 
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.OfflinePlayer
+import org.bukkit.*
 import org.bukkit.entity.Player
 
 object Lib {
@@ -79,5 +76,29 @@ object Lib {
 
     fun locationToDesplay(location: Location): String {
         return "${location.blockX}/${location.blockY}/${location.blockZ}"
+    }
+
+    fun isPortalNearby(location: Location): Boolean {
+        if (location.world != null) {
+            val radius = 8
+            for (x in location.blockX - radius..location.blockX + radius) {
+                for (y in location.blockY - radius..location.blockY + radius) {
+                    for (z in location.blockZ - radius..location.blockZ + radius) {
+                        if (location.world!!.getBlockAt(
+                                Location(
+                                    location.world,
+                                    x.toDouble(),
+                                    y.toDouble(),
+                                    z.toDouble()
+                                )
+                            ).type == Material.NETHER_PORTAL
+                        ) {
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
     }
 }
