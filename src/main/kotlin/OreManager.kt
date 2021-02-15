@@ -108,7 +108,6 @@ class OreManager(private val plugin: Plugin) {
             } else {
                 0
             } + getKeepHappy(player)
-            Bukkit.broadcastMessage("Miners Luck: $luck")
             if (oreReplaceableBlock(block.type)) {
                 var doSpawn = false
                 var radius = 0
