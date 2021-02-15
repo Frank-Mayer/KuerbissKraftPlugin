@@ -137,7 +137,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             return
         }
 
-        if (!oreManager.mine(event.block, event.player.inventory.itemInMainHand)) {
+        if (!oreManager.mine(event.block, event.player.inventory.itemInMainHand, Lib.getPlayerIdentifier(event.player))) {
             if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
                 if (!entityDataManager.removeChest(
                         event.block.location,

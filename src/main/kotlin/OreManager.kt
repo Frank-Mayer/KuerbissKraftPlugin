@@ -23,13 +23,14 @@ class OreManager(private val plugin: Plugin) {
     private var loaded = false
     private val storeDir = "${Settings.storePath}OreClearedChunks.json"
     private var lastHash: Int = -1
+    private val keepHappy = hashMapOf<String, Int>()
 
     private val updatedChunks = mutableSetOf<String>()
 
-    private val common = 40
-    private val uncommon = 75
-    private val rare = 200
-    private val veryRare = 400
+    private val common = 60
+    private val uncommon = 85
+    private val rare = 165
+    private val veryRare = 235
 
     init {
         val file = File(storeDir)
@@ -99,14 +100,15 @@ class OreManager(private val plugin: Plugin) {
         }, 1000, 2500)
     }
 
-    fun mine(block: Block, itemInHand: ItemStack): Boolean {
+    fun mine(block: Block, itemInHand: ItemStack, player: String): Boolean {
         val location = block.location
         if (location.world != null) {
             val luck = if (itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
                 itemInHand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)
             } else {
                 0
-            }
+            } + getKeepHappy(player)
+            Bukkit.broadcastMessage("Miners Luck: $luck")
             if (oreReplaceableBlock(block.type)) {
                 var doSpawn = false
                 var radius = 0
@@ -116,31 +118,14 @@ class OreManager(private val plugin: Plugin) {
                     0 -> {
                         // Redstone
                         if (location.blockY <= 13 && (Math.random() * uncommon) <= 1 + luck) {
-                            radius = (Math.random() * 2).roundToInt()
+                            radius = (Math.random() * 1.45f).roundToInt()
                             mat = Material.REDSTONE_ORE
                             doSpawn = true
+                            decrementKeepHappy(player, 7)
                         }
                     }
 
                     1 -> {
-                        // Diamond
-                        if (location.blockY <= 13 && (Math.random() * rare) <= 1 + luck) {
-                            radius = (Math.random()).roundToInt()
-                            mat = Material.DIAMOND_ORE
-                            doSpawn = true
-                        }
-                    }
-
-                    2 -> {
-                        // Emerald
-                        if (location.blockY <= 31 && (Math.random() * veryRare) <= 1 + luck) {
-                            radius = 0
-                            mat = Material.EMERALD_ORE
-                            doSpawn = true
-                        }
-                    }
-
-                    3 -> {
                         // Gold
                         if (block.biome == Biome.BADLANDS && location.blockY <= 80 && (Math.random() * common) <= 1 + luck) {
                             radius = (Math.random() * 2).roundToInt()
@@ -150,15 +135,37 @@ class OreManager(private val plugin: Plugin) {
                             radius = (Math.random() * 1).roundToInt()
                             mat = Material.GOLD_ORE
                             doSpawn = true
+                            decrementKeepHappy(player, 10)
+                        }
+                    }
+
+                    2 -> {
+                        // Diamond
+                        if (location.blockY <= 13 && (Math.random() * rare) <= 1 + luck) {
+                            radius = (Math.random()).roundToInt()
+                            mat = Material.DIAMOND_ORE
+                            doSpawn = true
+                            decrementKeepHappy(player, 20)
+                        }
+                    }
+
+                    3 -> {
+                        // Lapis
+                        if (location.blockY <= 32 && (Math.random() * rare) <= 1 + luck) {
+                            radius = 0
+                            mat = Material.LAPIS_ORE
+                            doSpawn = true
+                            decrementKeepHappy(player, 40)
                         }
                     }
 
                     4 -> {
-                        // Lapis
-                        if (location.blockY <= 32 && (Math.random() * rare) <= 1 + luck) {
-                            radius = (Math.random()).roundToInt()
-                            mat = Material.LAPIS_ORE
+                        // Emerald
+                        if (location.blockY <= 31 && (Math.random() * veryRare) <= 1 + luck) {
+                            radius = 0
+                            mat = Material.EMERALD_ORE
                             doSpawn = true
+                            decrementKeepHappy(player, 40)
                         }
                     }
                 }
@@ -183,6 +190,8 @@ class OreManager(private val plugin: Plugin) {
                         }
                     }
                     return true
+                } else {
+                    incrementKeepHappy(player)
                 }
             }
         }
@@ -247,6 +256,30 @@ class OreManager(private val plugin: Plugin) {
                 }
             }
             Logger.log("Removed $count unwanted ores")
+        }
+    }
+
+    private fun getKeepHappy(player: String): Int {
+        return if (keepHappy.containsKey(player)) {
+            keepHappy[player]!!
+        } else {
+            0
+        }
+    }
+
+    private fun decrementKeepHappy(player: String, amount: Int = 5) {
+        if (keepHappy.containsKey(player)) {
+            keepHappy[player] = (keepHappy[player]!! - amount).coerceAtLeast(0)
+        } else {
+            keepHappy[player] = 0
+        }
+    }
+
+    private fun incrementKeepHappy(player: String) {
+        if (keepHappy.containsKey(player)) {
+            keepHappy[player] = (keepHappy[player]!! + 1).coerceAtMost(veryRare - 20)
+        } else {
+            keepHappy[player] = 1
         }
     }
 }
