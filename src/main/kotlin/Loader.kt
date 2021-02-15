@@ -99,7 +99,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onEntityExplode(event: EntityExplodeEvent) {
         for (block in event.blockList()) {
-            if (block.type == Material.NETHER_PORTAL) {
+            if (block.type == Material.NETHER_PORTAL || block.type == Material.CHEST  || block.type == Material.TRAPPED_CHEST) {
                 event.isCancelled = true
                 return
             }
