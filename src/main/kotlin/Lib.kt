@@ -80,7 +80,7 @@ object Lib {
 
     fun isPortalNearby(location: Location): Boolean {
         if (location.world != null) {
-            val radius = 8
+            val radius = 4
             for (x in location.blockX - radius..location.blockX + radius) {
                 for (y in location.blockY - radius..location.blockY + radius) {
                     for (z in location.blockZ - radius..location.blockZ + radius) {

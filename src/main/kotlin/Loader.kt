@@ -9,10 +9,8 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockDamageEvent
-import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.*
+import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
@@ -93,17 +91,18 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPortalCreate(event: PortalCreateEvent) {
-        if (Settings.open) {
+        if (event.reason == PortalCreateEvent.CreateReason.FIRE && Settings.open) {
             event.isCancelled = true
         }
     }
 
     @EventHandler
-    fun onPortal(event: PlayerPortalEvent) {
-        if (event.to != null) {
-            entryProtector.protect(event.to!!)
-        } else {
-            Logger.error("Could not protect ${event.player.name}, target location is null")
+    fun onEntityExplode(event: EntityExplodeEvent) {
+        for (block in event.blockList()) {
+            if (block.type == Material.NETHER_PORTAL) {
+                event.isCancelled = true
+                return
+            }
         }
     }
 
@@ -165,6 +164,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
                 event.block.location,
                 playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
             )
+        }
+    }
+
+    @EventHandler
+    fun onPlayerBucketEmpty(event: PlayerBucketEmptyEvent) {
+        if (Settings.open && Lib.isPortalNearby(event.block.location)) {
+            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts setzen, das dient zum Schutz des Netherportals")
+            event.isCancelled = true
         }
     }
 
