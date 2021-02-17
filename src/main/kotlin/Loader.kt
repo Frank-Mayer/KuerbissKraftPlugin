@@ -1,9 +1,6 @@
 package main
 
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Material
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -37,6 +34,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var badLanguageChecker: BadLanguageChecker
     private lateinit var entryProtector: EntryProtector
     private lateinit var translator: Translator
+    private lateinit var customRecipes: CustomRecipes
 
     override fun onEnable() {
         registerModules()
@@ -46,6 +44,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         badLanguageChecker = inject<BadLanguageChecker>().value
         entryProtector = inject<EntryProtector>().value
         translator = inject<Translator>().value
+        customRecipes = inject<CustomRecipes>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -248,6 +247,8 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { BadLanguageChecker() }
             single { EntryProtector() }
             single { Translator() }
+            single { NamespacedKey(plugin, "kuerbisskraft") }
+            single { CustomRecipes(get()) }
         }
 
         startKoin {
