@@ -2,9 +2,9 @@ name: KuerbissKraft
 version: 0.1.0
 description: Game management plugin
 main: main.Loader
-api-version: 1.15
+api-version: 1.16
 author: Frank Mayer
 
 commands:
   kuerbiss:
-    description: varo options
+    description: kuerbisskraft options
