@@ -19,7 +19,6 @@ import java.io.FileWriter
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.collections.set
 import kotlin.concurrent.timerTask
 
@@ -275,11 +274,6 @@ class PlayerDataManager : KoinComponent {
                         player.kickPlayer("${ChatColor.AQUA}Team ${ChatColor.YELLOW}${aliveTeams.first()}${ChatColor.AQUA} hat KürbissKraft gewonnen")
                     }
                 }
-                Timer().schedule(timerTask {
-                    Bukkit.getScheduler().callSyncMethod(plugin) {
-                        Bukkit.shutdown()
-                    }
-                }, 3000)
             }, 3000)
         }
         return count
