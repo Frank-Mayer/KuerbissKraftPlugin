@@ -95,9 +95,9 @@ class PlayerDataManager : KoinComponent {
 //        Bukkit.getBanList(BanList.Type.NAME).addBan(player.name, reason, null, null)
         val team = getPlayerTeam(Lib.getPlayerIdentifier(player))
         var teammateAlive = false
-        for (player in playersData) {
-            if (player.value.alive && (player.value.strikes + (today - player.value.lastLogout - 1)) < 3) {
-                if (player.value.teamName == team) {
+        for (pl in playersData) {
+            if (pl.value.alive && (pl.value.strikes + (today - pl.value.lastLogout - 1)) < 3) {
+                if (pl.value.teamName == team) {
                     teammateAlive = true
                     break
                 }
