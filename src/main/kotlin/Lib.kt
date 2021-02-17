@@ -23,6 +23,12 @@ object Lib {
             }
             return false
         }
+        val now = (SimpleDateFormat("HHmm").format(Calendar.getInstance().time)).toLong()
+        if (now < 1730 || now > 2030) {
+            if (!player.isOp) {
+                player.kickPlayer("Du kannst dich nur von 17:30 bis 20:30 anmelden")
+            }
+        }
         val data = dataManager.getPlayerData(getPlayerIdentifier(player))
         if (data != null) {
             if (data.lastLogout > 1) {
