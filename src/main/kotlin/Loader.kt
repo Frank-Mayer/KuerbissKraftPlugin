@@ -36,7 +36,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var entityDataManager: EntityDataManager
     private lateinit var badLanguageChecker: BadLanguageChecker
     private lateinit var entryProtector: EntryProtector
-    private lateinit var oreManager: OreManager
     private lateinit var translator: Translator
 
     override fun onEnable() {
@@ -46,7 +45,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         cmdInterpreter = inject<CmdInterpreter>().value
         badLanguageChecker = inject<BadLanguageChecker>().value
         entryProtector = inject<EntryProtector>().value
-        oreManager = inject<OreManager>().value
         translator = inject<Translator>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
@@ -155,21 +153,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             return
         }
 
-        if (!oreManager.mine(
-                event.block,
-                event.player.inventory.itemInMainHand,
-                Lib.getPlayerIdentifier(event.player)
-            )
-        ) {
-            if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
-                if (!entityDataManager.removeChest(
-                        event.block.location,
-                        playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
-                    )
-                ) {
-                    playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
-                    event.isCancelled = true
-                }
+        if (event.block.type == Material.CHEST || event.block.type == Material.TRAPPED_CHEST) {
+            if (!entityDataManager.removeChest(
+                    event.block.location,
+                    playerDataManager.getPlayerTeam(Lib.getPlayerIdentifier(event.player))
+                )
+            ) {
+                playerDataManager.strikePlayer(event.player, "Du hast eine fremde Kiste zerstört")
+                event.isCancelled = true
             }
         }
     }
@@ -244,7 +235,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private fun onTick() {
         playerDataManager.storeData()
         entityDataManager.storeData()
-        oreManager.storeData()
     }
 
     private fun registerModules() {
@@ -257,7 +247,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { EntityDataManager(get()) }
             single { BadLanguageChecker() }
             single { EntryProtector() }
-            single { OreManager(get()) }
             single { Translator() }
         }
 
