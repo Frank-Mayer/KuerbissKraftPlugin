@@ -153,7 +153,14 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
         if (Settings.pause || (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location)))) {
-            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts abbauen, das dient zum Schutz des Netherportals")
+            if (event.block.type == Material.NETHER_PORTAL || event.block.type == Material.OBSIDIAN) {
+                playerDataManager.strikePlayer(
+                    event.player,
+                    "Du kannst hier nichts abbauen, das dient zum Schutz des Netherportals"
+                )
+            } else {
+                event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts abbauen, das dient zum Schutz des Netherportals")
+            }
             event.isCancelled = true
             return
         }
@@ -173,7 +180,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (Settings.pause || (Settings.open && Lib.isPortalNearby(event.block.location))) {
-            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts setzen, das dient zum Schutz des Netherportals")
+            playerDataManager.strikePlayer(
+                event.player,
+                "Du kannst hier nichts setzen, das dient zum Schutz des Netherportals"
+            )
             event.isCancelled = true
             return
         }
@@ -189,7 +199,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     @EventHandler
     fun onPlayerBucketEmpty(event: PlayerBucketEmptyEvent) {
         if (Settings.open && Lib.isPortalNearby(event.block.location)) {
-            event.player.sendMessage("${ChatColor.RED}Du kannst hier nichts setzen, das dient zum Schutz des Netherportals")
+            playerDataManager.strikePlayer(
+                event.player,
+                "Du kannst hier nichts setzen, das dient zum Schutz des Netherportals"
+            )
             event.isCancelled = true
         }
     }
@@ -229,7 +242,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     fun onPlayerRecipeDiscover(event: PlayerRecipeDiscoverEvent) {
         val recipe = Bukkit.getRecipe(event.recipe)
         if (recipe != null) {
-            if (!recipeManager.isUnlocked("${Lib.getPlayerIdentifier(event.player)}:${recipe!!.result.type.name}")) {
+            if (!recipeManager.isUnlocked("${Lib.getPlayerIdentifier(event.player)}:${recipe.result.type.name}")) {
                 event.isCancelled = true
             }
         }
