@@ -1,9 +1,13 @@
 package main
 
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -13,6 +17,8 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.inventory.FurnaceExtractEvent
 import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.plugin.Plugin
@@ -34,7 +40,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     private lateinit var badLanguageChecker: BadLanguageChecker
     private lateinit var entryProtector: EntryProtector
     private lateinit var translator: Translator
-    private lateinit var customRecipes: CustomRecipes
+    private lateinit var recipeManager: RecipeManager
 
     override fun onEnable() {
         registerModules()
@@ -44,7 +50,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         badLanguageChecker = inject<BadLanguageChecker>().value
         entryProtector = inject<EntryProtector>().value
         translator = inject<Translator>().value
-        customRecipes = inject<CustomRecipes>().value
+        recipeManager = inject<RecipeManager>().value
         playerDataManager.loadData()
         entityDataManager.loadData()
         Bukkit.getPluginManager().registerEvents(this, this)
@@ -221,7 +227,24 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerRecipeDiscover(event: PlayerRecipeDiscoverEvent) {
-        event.isCancelled = true
+        val recipe = Bukkit.getRecipe(event.recipe)
+        if (recipe != null) {
+            if (!recipeManager.isUnlocked("${Lib.getPlayerIdentifier(event.player)}:${recipe!!.result.type.name}")) {
+                event.isCancelled = true
+            }
+        }
+    }
+
+    @EventHandler
+    fun onCraftItem(event: CraftItemEvent) {
+        val id = "${Lib.getPlayerIdentifier(event.whoClicked as Player)}:${event.recipe.result.type.name}"
+        recipeManager.unlock(id)
+    }
+
+    @EventHandler
+    fun onFurnaceExtract(event: FurnaceExtractEvent) {
+        val id = "${Lib.getPlayerIdentifier(event.player)}:${event.itemType.name}"
+        recipeManager.unlock(id)
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -247,7 +270,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { BadLanguageChecker() }
             single { EntryProtector() }
             single { Translator() }
-            single { CustomRecipes(get()) }
+            single { RecipeManager(get()) }
         }
 
         startKoin {
