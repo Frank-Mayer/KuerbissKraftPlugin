@@ -247,7 +247,6 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
             single { BadLanguageChecker() }
             single { EntryProtector() }
             single { Translator() }
-            single { NamespacedKey(plugin, "kuerbisskraft") }
             single { CustomRecipes(get()) }
         }
 
