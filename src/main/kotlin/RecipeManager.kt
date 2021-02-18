@@ -1,10 +1,8 @@
 package main
 
-import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getServer
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ShapedRecipe
