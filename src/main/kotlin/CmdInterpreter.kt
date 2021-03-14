@@ -141,9 +141,26 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                         return true
                     }
 
+                    "observer" -> {
+                        if (args.count() >= 2) {
+                            when (args[1]) {
+                                "start" -> {
+                                    playerDataManager.observeStart(sender as Player)
+                                    return true
+                                }
+                                "stop" -> {
+                                    playerDataManager.observeStop(sender as Player)
+                                    return true
+                                }
+                            }
+                        }
+                        return false
+                    }
+
                     "start" -> {
                         Bukkit.broadcastMessage("${ChatColor.AQUA}Das Event hat begonnen! Der Server darf ab jetzt nicht mehr verlassen werden, bis deine Tageszeit aufgebraucht ist!")
                         Settings.pause = false
+                        Settings.lobbyMode = true
                         Settings.quitNotAllowed = true
 
                         var spawnLoc: IntArray
@@ -165,7 +182,6 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                         }
 
                         // Set default world settings
-                        GameRule.ANNOUNCE_ADVANCEMENTS
                         for (world in Bukkit.getWorlds()) {
                             world.setGameRule(GameRule.LOG_ADMIN_COMMANDS, false)
                             world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, true)
@@ -247,6 +263,7 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                                     }
                                 }
                                 Bukkit.broadcastMessage("${ChatColor.GREEN}Mögen die Spiele beginnen!")
+                                Settings.lobbyMode = false
 
                                 // Remove Elytra
                                 val e = Timer()

@@ -48,9 +48,7 @@ object Lib {
                 }
             }
             if (data.lastLogout == dataManager.today && data.dayPlayTime >= Settings.maxPlayTime - 2) {
-                if (player.isOp) {
-                    player.gameMode = GameMode.SPECTATOR
-                } else {
+                if (!dataManager.observeStart(player)) {
                     Settings.quitNotAllowed = false
                     player.kickPlayer("Deine Tageszeit ist aufgebraucht")
                 }

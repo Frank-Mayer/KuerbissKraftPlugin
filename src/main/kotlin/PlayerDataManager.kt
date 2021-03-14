@@ -278,4 +278,26 @@ class PlayerDataManager : KoinComponent {
         }
         return count
     }
+
+    fun observeStart(player: Player): Boolean {
+        val id = Lib.getPlayerIdentifier(player)
+        if (player.isOp) {
+            if (!opLocations.containsKey(id)) {
+                opLocations[id] = player.location
+            }
+            player.gameMode = GameMode.SPECTATOR
+            return true
+        }
+        return false
+    }
+
+    fun observeStop(player: Player) {
+        val id = Lib.getPlayerIdentifier(player)
+        if (opLocations.containsKey(id)) {
+            player.teleport(opLocations[id]!!)
+            player.gameMode = GameMode.SURVIVAL
+            opLocations.remove(id)
+            player.kickPlayer("Observer mode deaktiviert")
+        }
+    }
 }
