@@ -3,14 +3,13 @@ package main
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import main.data.PlayerData
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.Team
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -19,9 +18,11 @@ import java.io.FileWriter
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.set
 import kotlin.concurrent.timerTask
 
+@KoinApiExtension
 class PlayerDataManager : KoinComponent {
     private val playersTracer = HashMap<String, PlayerTrace>()
     private val playersData = HashMap<String, PlayerData>()
@@ -31,6 +32,7 @@ class PlayerDataManager : KoinComponent {
     private var loaded = false
     val today = (SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().time)).toLong()
     private var lastHash: Int = -1
+    private val opLocations = HashMap<String, Location>()
 
     init {
         val path = File(Settings.storePath)
@@ -277,6 +279,19 @@ class PlayerDataManager : KoinComponent {
             }, 3000)
         }
         return count
+    }
+
+    /**
+     * Try find the Player object that belongs to the players teammate
+     */
+    fun getTeammateOfPlayer(player: Player): Player? {
+        val team = getPlayerTeam(Lib.getPlayerIdentifier(player))
+        for (pData in playersData) {
+            if (pData.value.teamName == team && Lib.getPlayerIdentifier(player) != pData.value.id) {
+                return Bukkit.getPlayer(pData.value.id)
+            }
+        }
+        return null
     }
 
     fun observeStart(player: Player): Boolean {
