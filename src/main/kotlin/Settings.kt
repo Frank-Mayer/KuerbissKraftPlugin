@@ -14,4 +14,6 @@ object Settings {
     var quitNotAllowed = false
 
     var pause = false
+
+    var lobbyMode = false
 }

@@ -69,7 +69,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
-        if (Settings.pause) {
+        if (Settings.pause || Settings.lobbyMode) {
             event.isCancelled = true
         }
     }
@@ -119,6 +119,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onEntityExplode(event: EntityExplodeEvent) {
+        if (Settings.pause || Settings.lobbyMode) {
+            event.isCancelled = true
+            return
+        }
         for (block in event.blockList()) {
             if (block.type == Material.NETHER_PORTAL || block.type == Material.CHEST || block.type == Material.TRAPPED_CHEST) {
                 event.isCancelled = true
@@ -152,7 +156,7 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (Settings.pause || (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location)))) {
+        if (Settings.pause || Settings.lobbyMode || (Settings.open && (event.block.type == Material.NETHER_PORTAL || Lib.isPortalNearby(event.block.location)))) {
             if (event.block.type == Material.NETHER_PORTAL || event.block.type == Material.OBSIDIAN) {
                 playerDataManager.strikePlayer(
                     event.player,
@@ -179,7 +183,11 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-        if (Settings.pause || (Settings.open && Lib.isPortalNearby(event.block.location))) {
+        if (Settings.pause || Settings.lobbyMode) {
+            event.isCancelled = true
+            return
+        }
+        if (Settings.open && Lib.isPortalNearby(event.block.location)) {
             playerDataManager.strikePlayer(
                 event.player,
                 "Du kannst hier nichts setzen, das dient zum Schutz des Netherportals"
@@ -198,6 +206,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerBucketEmpty(event: PlayerBucketEmptyEvent) {
+        if (Settings.pause || Settings.lobbyMode) {
+            event.isCancelled = true
+            return
+        }
         if (Settings.open && Lib.isPortalNearby(event.block.location)) {
             playerDataManager.strikePlayer(
                 event.player,
@@ -209,6 +221,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (Settings.pause || Settings.lobbyMode) {
+            event.isCancelled = true
+            return
+        }
         if (event.action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock != null) {
             if (event.clickedBlock!!.type == Material.CHEST || event.clickedBlock!!.type == Material.TRAPPED_CHEST) {
                 if (!entityDataManager.ownChest(
@@ -268,8 +284,10 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
     }
 
     private fun onTick() {
-        playerDataManager.storeData()
-        entityDataManager.storeData()
+        if (!Settings.pause && !Settings.lobbyMode) {
+            playerDataManager.storeData()
+            entityDataManager.storeData()
+        }
     }
 
     private fun registerModules() {

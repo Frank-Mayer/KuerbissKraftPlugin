@@ -141,6 +141,20 @@ class CmdInterpreter(private val playerDataManager: PlayerDataManager, private v
                         return true
                     }
 
+                    "lobby" -> {
+                        if (args.count() >= 2) {
+                            Settings.lobbyMode = args[1] == "true"
+                            if (Settings.lobbyMode) {
+                                sender.sendMessage("Lobby mode aktiv")
+                            } else {
+                                sender.sendMessage("Lobby mode inaktiv")
+                            }
+                        } else {
+                            sender.sendMessage("Settings.lobbyMode is currently set to: ${Settings.lobbyMode}")
+                        }
+                        return true
+                    }
+
                     "observer" -> {
                         if (args.count() >= 2) {
                             when (args[1]) {
