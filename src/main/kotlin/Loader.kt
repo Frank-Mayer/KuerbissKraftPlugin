@@ -79,6 +79,9 @@ class Loader : JavaPlugin(), Listener, CommandExecutor, KoinComponent {
         if (Lib.playerCheckIn(event.player, playerDataManager)) {
             playerDataManager.addPlayer(event.player)
             event.player.sendMessage("${ChatColor.AQUA}Nutze die /kurbiss <option> commands um aktuelle Informationen zu erhalten\nstrikes: Zeigt wie viele Strikes du hast\ntime: zeigt deine aktuelle Online-Zeit an")
+            if (event.player.isOp) {
+                event.player.sendMessage("${ChatColor.AQUA}Für OPs:\nlobby <boolean>: daktiviere abbauen, bauen, schlagen, timer\npause <boolean>: deaktiviere jede bewegung aller spieler + pausiere timer\n\nWenn deine Zeit abgelaufen ist, wechselst du automatisch in den observer mode\nobserver stop: Teleportiere dich zurück und deaktiviere observer mode")
+            }
             entryProtector.login(event.player)
             entryProtector.protect(event.player.location)
         }
