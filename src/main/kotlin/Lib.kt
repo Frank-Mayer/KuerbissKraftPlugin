@@ -38,12 +38,15 @@ object Lib {
                 when {
                     dif == 1L -> {
                         dataManager.strikePlayer(player, "Du warst einen Tag nicht online")
+                        return false
                     }
                     dif == 2L -> {
                         dataManager.strikePlayer(player, "Du warst zwei Tage nicht online", 2)
+                        return false
                     }
                     dif >= 3L -> {
                         dataManager.strikePlayer(player, "Du warst viel zu lange nicht online", 3)
+                        return false
                     }
                 }
             }
